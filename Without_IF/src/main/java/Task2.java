@@ -1,21 +1,17 @@
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+
 
 public class Task2 {
     public static void main(String[] args) {
-
+        Calendar date = Calendar.getInstance();
+        date.set(2018,Calendar.OCTOBER,14);
+        System.out.println(getDayOfWeek(date));
     }
-    public static String getDayOfTheWeek(String date) {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("dd-mm-yyyy");
-        try {
-            cal.setTime(format.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        int dayOfTheWeek = cal.get(Calendar.DAY_OF_WEEK);
-        return (dayOfTheWeek > 5 ? "выходной" : "будний");
+    public static String getDayOfWeek(Calendar date) {
+        int buffValue = date.get(Calendar.DAY_OF_WEEK) - 1;
+        int[] daysArray = {7, 1, 2 , 3, 4, 5, 6};
+        int dayOfWeek = daysArray[buffValue];
+        String[] buffArray = {"будний", "выходной"};
+        return buffArray[dayOfWeek/6];
     }
 }
