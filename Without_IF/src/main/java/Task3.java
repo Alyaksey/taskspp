@@ -1,19 +1,24 @@
 public class Task3 {
     public static void main(String[] args) {
-        doubleArg("5.5");
-        doubleArg("abcd");
     }
-    public static void doubleArg(String arg) {
+
+    public static String doubleArg(String arg) {
         try {
-            double number = Double.parseDouble(arg);
+            int number = Integer.parseInt(arg);
             number *= 2;
-            System.out.println(number);
+            return Integer.toString(number);
         } catch (NumberFormatException e) {
-            StringBuilder doubleString = new StringBuilder();
-            for (int i = 0; i <arg.length(); i++) {
-                doubleString.append(arg.charAt(i)).append(arg.charAt(i));
+            try {
+                double number = Double.parseDouble(arg);
+                number *= 2;
+                return Double.toString(number);
+            } catch (NumberFormatException ex) {
+                StringBuilder doubleString = new StringBuilder();
+                for (int i = 0; i < arg.length(); i++) {
+                    doubleString.append(arg.charAt(i)).append(arg.charAt(i));
+                }
+                return doubleString.toString();
             }
-            System.out.println(doubleString);
         }
     }
 }
