@@ -1,9 +1,8 @@
-import java.sql.SQLOutput;
-import java.util.Random;
+import java.util.Arrays;
 
 public class Task13 {
     public static void main(String[] args) {
-        int[][] array = new int[5][6];
+        int[][] array = new int[3][3];
         initArray(array);
         printArray(array);
         System.out.println();
@@ -11,8 +10,8 @@ public class Task13 {
         System.out.println();
         System.out.println(findAverage(array));
     }
-    public static int Random(int min, int max)
-    {
+
+    public static int Random(int min, int max) {
         max -= min;
         return (int) (Math.random() * ++max) + min;
     }
@@ -35,8 +34,6 @@ public class Task13 {
     }
 
     public static void findMinElement(int[][] array) {
-        int columns = array[array.length - 1].length;
-        int[] maxElems = new int[columns];
         int min = array[0][0];
         for (int i = 0; i < array[0].length; i++) {
             min = array[0][i];
@@ -49,15 +46,10 @@ public class Task13 {
     }
 
     public static double findAverage(int[][] array) {
-        double average = 0.0;
-        int count = 0;
-        for (int[] arr : array) {
-            for (int item : arr)
-                if (item < 0) {
-                    average += item;
-                    count++;
-                }
-        }
-        return average / count;
+        return Arrays.stream(array)
+                .flatMapToInt(Arrays::stream)
+                .filter(x -> x < 0)
+                .average()
+                .getAsDouble();
     }
 }
