@@ -15,11 +15,13 @@ public class Puddles2D {
             локальный максимум и вычитаем высоту стены, которая идет после локального максимума
             */
             if (leftMax >= rightMax) {
-                volume += rightMax - walls[rightPointer];
+                if (walls[rightPointer] != 0)
+                    volume += rightMax - walls[rightPointer];
                 rightPointer--;
             }
             if (leftMax < rightMax) {
-                volume += leftMax - walls[leftPointer];
+                if (walls[leftPointer] != 0)
+                    volume += leftMax - walls[leftPointer];
                 leftPointer++;
             }
         }

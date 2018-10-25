@@ -20,7 +20,7 @@ public class Puddles2DTest {
     @Parameterized.Parameters
     public static Collection numbers() {
         return Arrays.asList(new Object[][]{
-                {new int[]{5, 0, 0, 5}, 10},
+                {new int[]{5, 0, 0, 5}, 0},
                 {new int[]{0, 0, 0, 0}, 0},
                 {new int[]{1, 2, 3, 2, 3, 1, 4}, 3},
                 {new int[]{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}, 0},
@@ -30,7 +30,7 @@ public class Puddles2DTest {
                 {new int[]{6, 7, 7, 4, 3, 2, 1, 5, 2}, 10},
                 {new int[]{2, 5, 1, 2, 3, 4, 7, 7, 6}, 10},
                 {new int[]{6, 1, 4, 6, 7, 5, 1, 6, 4}, 13},
-                {new int[]{4, 0, 0, 4, 0, 4, 0, 0, 4, 2}, 20},
+                {new int[]{4, 0, 0, 4, 0, 4, 0, 0, 4, 2}, 0},
         });
     }
 

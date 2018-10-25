@@ -42,7 +42,8 @@ public class Puddles3D {
                         && !isVisited[neighbourRow][neighbourColumn]) {
                     isVisited[neighbourRow][neighbourColumn] = true;
                     //Если высота соседа данной ячейки меньше, чем высота текущей, то прибавляем к уровню воды их разницу
-                    volume += Math.max(0, currentCell.height - walls[neighbourRow][neighbourColumn]);
+                    if (walls[neighbourRow][neighbourColumn] != 0)
+                        volume += Math.max(0, currentCell.height - walls[neighbourRow][neighbourColumn]);
                     //Добавляем в очередь соседей, и запоминаем уровень воды, то есть наибольшую по высоте ячейку
                     pq.add(new Cell(neighbourRow, neighbourColumn,
                             Math.max(walls[neighbourRow][neighbourColumn], currentCell.height)));
