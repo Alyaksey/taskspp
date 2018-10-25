@@ -25,7 +25,7 @@ public class Puddles3D {
         //Задаем директории, по которым будем двигаться в четырех направлениях
         int[] dirRows = {0, 0, 1, -1};
         int[] dirColumns = {1, -1, 0, 0};
-        //Rоординаты соседних ячеек
+        //Координаты соседних ячеек
         int neighbourRow;
         int neighbourColumn;
         Cell currentCell;
