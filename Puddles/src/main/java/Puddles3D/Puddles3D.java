@@ -9,7 +9,7 @@ public class Puddles3D {
         int columns = walls[0].length;
         PriorityQueue<Cell> pq = new PriorityQueue<Cell>();
         boolean[][] isVisited = new boolean[rows][columns];
-        //Заносим в PriorityQueue рамки массива и помечаем их посещенными
+        //Заносим в PriorityQueue рамки массива, нули внутри рамок и помечаем их посещенными
         for (int i = 0; i < rows; i++) {
             isVisited[i][0] = true;
             isVisited[i][columns - 1] = true;
@@ -21,6 +21,14 @@ public class Puddles3D {
             isVisited[rows - 1][j] = true;
             pq.add(new Cell(0, j, walls[0][j]));
             pq.add(new Cell(rows - 1, j, walls[rows - 1][j]));
+        }
+        for (int i = 1; i < rows - 1; i++) {
+            for (int j = 1; j < columns - 1; j++) {
+                if (walls[i][j] == 0) {
+                    pq.add(new Cell(i, j, walls[i][j]));
+                    isVisited[i][j] = true;
+                }
+            }
         }
         //Задаем директории, по которым будем двигаться в четырех направлениях
         int[] dirRows = {0, 0, 1, -1};
@@ -42,8 +50,7 @@ public class Puddles3D {
                         && !isVisited[neighbourRow][neighbourColumn]) {
                     isVisited[neighbourRow][neighbourColumn] = true;
                     //Если высота соседа данной ячейки меньше, чем высота текущей, то прибавляем к уровню воды их разницу
-                    if (walls[neighbourRow][neighbourColumn] != 0)
-                        volume += Math.max(0, currentCell.height - walls[neighbourRow][neighbourColumn]);
+                    volume += Math.max(0, currentCell.height - walls[neighbourRow][neighbourColumn]);
                     //Добавляем в очередь соседей, и запоминаем уровень воды, то есть наибольшую по высоте ячейку
                     pq.add(new Cell(neighbourRow, neighbourColumn,
                             Math.max(walls[neighbourRow][neighbourColumn], currentCell.height)));

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Task10 {
     public static void main(String[] args) {
@@ -35,7 +36,7 @@ public class Task10 {
         return sum;
     }
 
-    public static int findMaxPositive(int[] array) {
+    public static int findMaxPositiveIndex(int[] array) {
         int indexOfMax = 0;
         for (int i = 0; i < array.length; i++) {
             if (array[i] > array[indexOfMax])
@@ -51,10 +52,12 @@ public class Task10 {
         }
         return bool;
     }
-    public static void printEvens(int[] array){
+    public static ArrayList<Integer> getEvens(int[] array){
+        ArrayList<Integer> evens = new ArrayList<>();
         for (int i = 0; i < array.length; i++) {
             if (array[i] % 2 == 0)
-                    System.out.format("a[%d]= %d%n", i, array[i]);
+                    evens.add(new Integer(array[i]));
         }
+        return evens;
     }
 }

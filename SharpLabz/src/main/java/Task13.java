@@ -6,7 +6,7 @@ public class Task13 {
         initArray(array);
         printArray(array);
         System.out.println();
-        findMinElement(array);
+        System.out.println(Arrays.toString(findMinElement(array)));
         System.out.println();
         System.out.println(findAverage(array));
     }
@@ -33,16 +33,18 @@ public class Task13 {
         }
     }
 
-    public static void findMinElement(int[][] array) {
+    public static int[] findMinElement(int[][] array) {
         int min = array[0][0];
+        int[] minElems = new int[array[0].length];
         for (int i = 0; i < array[0].length; i++) {
             min = array[0][i];
             for (int j = 0; j < array.length; j++) {
                 if (min > array[j][i])
                     min = array[j][i];
             }
-            System.out.print(min + "\t");
+            minElems[i] = min;
         }
+        return minElems;
     }
 
     public static double findAverage(int[][] array) {

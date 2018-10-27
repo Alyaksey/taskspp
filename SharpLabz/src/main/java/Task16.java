@@ -16,11 +16,12 @@ public class Task16 {
             sb.append(chrArray.charAt(rnd.nextInt(chrArray.length())));
         }
     }
-    public static void replaceChars(StringBuilder sb){
+    public static StringBuilder replaceChars(StringBuilder sb){
         for (int i = 0; i < sb.length(); i++) {
             if (sb.charAt(i) == ';')
                 sb.setCharAt(i,'_');
         }
+        return sb;
     }
 
 }
