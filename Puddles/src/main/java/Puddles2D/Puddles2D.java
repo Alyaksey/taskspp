@@ -1,6 +1,5 @@
 package Puddles2D;
 
-import java.util.Arrays;
 import java.util.PriorityQueue;
 
 public class Puddles2D {
