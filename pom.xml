@@ -18,6 +18,7 @@
         <module>SharpLabz</module>
         <module>Without_IF</module>
         <module>Puddles</module>
+        <module>Easy_Tasks</module>
     </modules>
 
     <build>
