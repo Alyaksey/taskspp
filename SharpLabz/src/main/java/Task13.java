@@ -1,15 +1,6 @@
 import java.util.Arrays;
 
 public class Task13 {
-    public static void main(String[] args) {
-        int[][] array = new int[3][3];
-        initArray(array);
-        printArray(array);
-        System.out.println();
-        System.out.println(Arrays.toString(findMinElement(array)));
-        System.out.println();
-        System.out.println(findAverage(array));
-    }
 
     public static int Random(int min, int max) {
         max -= min;
@@ -25,22 +16,22 @@ public class Task13 {
     }
 
     public static void printArray(int[][] array) {
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[i].length; j++) {
-                System.out.print(array[i][j] + "\t");
+        for (int[] anArray : array) {
+            for (int anAnArray : anArray) {
+                System.out.print(anAnArray + "\t");
             }
             System.out.println();
         }
     }
 
     public static int[] findMinElement(int[][] array) {
-        int min = array[0][0];
+        int min;
         int[] minElems = new int[array[0].length];
         for (int i = 0; i < array[0].length; i++) {
             min = array[0][i];
-            for (int j = 0; j < array.length; j++) {
-                if (min > array[j][i])
-                    min = array[j][i];
+            for (int[] anArray : array) {
+                if (min > anArray[i])
+                    min = anArray[i];
             }
             minElems[i] = min;
         }

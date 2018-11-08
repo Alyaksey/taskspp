@@ -9,9 +9,10 @@ public class Group {
         this.students = students;
     }
 
-    public Group(){
+    public Group() {
     }
-    public void addStudent(Student student){
+
+    public void addStudent(Student student) {
         students.add(student);
     }
 

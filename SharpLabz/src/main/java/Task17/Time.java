@@ -20,6 +20,8 @@ public class Time {
         }
     }
 
+    public Time() {
+    }
 
     public int getHours() {
         return hours;
@@ -30,7 +32,7 @@ public class Time {
             checkHours(hours);
             this.hours = hours;
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -43,7 +45,7 @@ public class Time {
             checkMinutes(minutes);
             this.minutes = minutes;
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -56,31 +58,32 @@ public class Time {
             checkSeconds(seconds);
             this.seconds = seconds;
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
     private void checkHours(int hours) {
         if (hours < 0 || hours > 23) {
-            throw new IllegalArgumentException("Диапазон часов 0-23");
+            throw new IllegalArgumentException();
         }
     }
 
     private void checkMinutes(int minutes) {
         if (minutes < 0 || minutes > 59) {
-            throw new IllegalArgumentException("Диапазон минут 0-59");
+            throw new IllegalArgumentException();
         }
     }
 
     private void checkSeconds(int seconds) {
         if (seconds < 0 || seconds > 59) {
-            throw new IllegalArgumentException("Диапазон секунд 0-59");
+            throw new IllegalArgumentException();
         }
     }
 
     public void changeHours(int hours) {
+        //Проверяем, если число выходит за пределы часов
         if (getHours() + hours > 23)
-            setHours(getHours() + hours % 24);
+            setHours(getHours() + hours - (((getHours() + hours) / 24) * 24));
         else if (getHours() + hours < 0) {
             if (hours % 24 == 0)
                 setHours(getHours());
@@ -91,38 +94,42 @@ public class Time {
     }
 
     public void changeMinutes(int minutes) {
-        changeHours(minutes / 60);
-        if (getMinutes() + minutes > 59)
-            setMinutes(getMinutes() + minutes % 60);
+        if (getMinutes() + minutes > 59) {
+            changeHours((getMinutes() + minutes) / 60);//В зависимости от минут меняем также и часы
+            setMinutes(getMinutes() + minutes - (((getMinutes() + minutes) / 60) * 60));
+        }
         else if (getMinutes() + minutes < 0) {
+            changeHours((getMinutes() + minutes) / 60 - 1);//В случае с отрицательным числом минут меняем часы
             if (minutes % 60 == 0)
                 setMinutes(getMinutes());
             else
                 setMinutes(getMinutes() + 60 + minutes % 60);
-        }
-        else
-            changeMinutes(getMinutes() + minutes);
+        } else
+            setMinutes(getMinutes() + minutes);
     }
-    public void changeSeconds(int seconds){
-        changeMinutes(seconds / 60);
-        if (getSeconds() + seconds > 59)
-            setMinutes(getSeconds() + seconds % 60);
-        else if (getSeconds() + seconds < 0) {
-            if (seconds % 60 == 0)
-                setMinutes(getSeconds());
-            else
-                setMinutes(getSeconds() + 60 + seconds % 60);
+
+    public void changeSeconds(int seconds) {
+        if (getSeconds() + seconds > 59) {
+            changeMinutes((getSeconds() + seconds) / 60);//В зависимости от секунд меняем минуты
+            setSeconds(getSeconds() + seconds - (((getSeconds() + seconds) / 60) * 60));
         }
-        else
-            changeMinutes(getSeconds() + seconds);
+        else if (getSeconds() + seconds < 0) {
+            changeMinutes((getSeconds() + seconds) / 60 - 1);//С отрицательным числом секунд меняем минуты
+            if (seconds % 60 == 0)
+                setSeconds(getSeconds());
+            else
+                setSeconds(getSeconds() + 60 + seconds % 60);
+        } else
+            setSeconds(getSeconds() + seconds);
     }
 
     @Override
     public String toString() {
-        return "Time{" +
-                "hours=" + hours +
-                ", minutes=" + minutes +
-                ", seconds=" + seconds +
-                '}';
+        final StringBuilder sb = new StringBuilder("Time{");
+        sb.append("hours=").append(hours);
+        sb.append(", minutes=").append(minutes);
+        sb.append(", seconds=").append(seconds);
+        sb.append('}');
+        return sb.toString();
     }
 }

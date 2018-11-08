@@ -32,11 +32,15 @@ public class Student implements Comparable<Student> {
 
     @Override
     public int compareTo(Student other) {
-        return specialty.compareTo(other.specialty);
+        return specialty.compareTo(other.specialty);//Сравниваем по специальностям студентов, чтобы потом отсортировать
     }
 
     @Override
     public String toString() {
-        return surname + " (" + specialty + ")";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(surname);
+        sb.append(" ");
+        sb.append(specialty);
+        return sb.toString();
     }
 }

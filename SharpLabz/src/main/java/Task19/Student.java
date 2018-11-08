@@ -1,6 +1,8 @@
 package Task19;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,54 +68,56 @@ public class Student implements Comparable<Student> {
     }
 
     public double getAverage() {
-        return (double)(mathScore + physScore + infoScore) / 3;
+        return (double) (mathScore + physScore + infoScore) / 3;
     }
-    public static double[] getAllAverages(ArrayList<Student> students){
+
+    public static double[] getAllAverages(List<Student> students) {
         double[] averages = new double[students.size()];
         for (int i = 0; i < students.size(); i++) {
-            averages[i] = students.get(i).getAverage();
+            averages[i] = Double.parseDouble(new BigDecimal(students.get(i)
+                    .getAverage()).setScale(1, RoundingMode.HALF_EVEN).toString());
         }
         return averages;
     }
 
-    public static ArrayList<String> getGoodStudents(ArrayList<Student> students) {
+    public static ArrayList<String> getGoodStudents(List<Student> students) {
         ArrayList<String> goodStuds = new ArrayList<>();
-        for (int i = 0; i < students.size(); i++) {
-            if (students.get(i).mathScore > 3 && students.get(i).physScore > 3 && students.get(i).infoScore > 3)
-                goodStuds.add(students.get(i).name + " " + students.get(i).surname);
+        for (Student student : students) {
+            if (student.mathScore > 3 && student.physScore > 3 && student.infoScore > 3)
+                goodStuds.add(new StringBuilder()
+                        .append(student.name).append(" ").append(student.surname).toString());
         }
         return goodStuds;
     }
 
-    private static double findMaxScore(ArrayList<Student> students) {
-        return Collections.max(students).getAverage();
-    }
-
-    public static ArrayList<String> findBestStudents(ArrayList<Student> students) {
-        double maxAvg = findMaxScore(students);
+    public static ArrayList<String> getBestStudents(List<Student> students) {
+        double maxAvg = Collections.max(students).getAverage();
         ArrayList<String> bestStuds = new ArrayList<>();
         for (Student item : students) {
             if (item.getAverage() == maxAvg) {
-                bestStuds.add(item.name + " " + item.surname);
+                bestStuds.add(new StringBuilder()
+                        .append(item.name).append(" ").append(item.surname).toString());
             }
         }
         return bestStuds;
     }
 
-    public static void sortStudents(ArrayList<Student> students) {
+    public static void sortStudents(List<Student> students) {
         Collections.sort(students);
         Collections.reverse(students);
     }
 
-    public static double[] getThreeAverages(ArrayList<Student> students) {
+    public static double[] getThreeAverages(List<Student> students) {
         double[] avgScores = new double[3];
-        for (int i = 0; i < students.size(); i++) {
-            avgScores[0] += students.get(i).mathScore;
-            avgScores[1] += students.get(i).physScore;
-            avgScores[2] += students.get(i).infoScore;
+        for (Student student : students) {
+            avgScores[0] += student.mathScore;
+            avgScores[1] += student.physScore;
+            avgScores[2] += student.infoScore;
         }
         for (int i = 0; i < avgScores.length; i++) {
-            avgScores[i] /= (double)students.size();
+            avgScores[i] /= (double) students.size();
+            avgScores[i] = Double.parseDouble(new BigDecimal(avgScores[i])
+                    .setScale(1,RoundingMode.HALF_EVEN).toString());
         }
         return avgScores;
     }
@@ -126,12 +130,18 @@ public class Student implements Comparable<Student> {
 
     @Override
     public int compareTo(Student other) {
-        return (int) (getAverage() - other.getAverage());
+        return Double.compare(getAverage(), other.getAverage());
     }
 
     @Override
     public String toString() {
-        return name + " " + surname + " " + mathScore + " " + physScore + " " + infoScore;
+        final StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        sb.append(" ").append(surname);
+        sb.append(" ").append(mathScore);
+        sb.append(" ").append(physScore);
+        sb.append(" ").append(infoScore);
+        return sb.toString();
     }
 
     public static void main(String[] args) {
@@ -150,7 +160,7 @@ public class Student implements Comparable<Student> {
             fw.append("\n");
             fw.append(Arrays.toString(Student.getThreeAverages(students)));
             fw.append("\n");
-            fw.append(Student.findBestStudents(students).toString());
+            fw.append(Student.getBestStudents(students).toString());
             fw.append("\n");
             Student.sortStudents(students);
             fw.append(students.toString());
@@ -159,4 +169,5 @@ public class Student implements Comparable<Student> {
             ex.printStackTrace();
         }
     }
+
 }
