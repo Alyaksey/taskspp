@@ -19,6 +19,7 @@
         <module>Without_IF</module>
         <module>Puddles</module>
         <module>Easy_Tasks</module>
+        <module>STasks</module>
     </modules>
 
     <build>
