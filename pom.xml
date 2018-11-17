@@ -20,6 +20,7 @@
         <module>Puddles</module>
         <module>Easy_Tasks</module>
         <module>STasks</module>
+        <module>Sort</module>
     </modules>
 
     <build>
