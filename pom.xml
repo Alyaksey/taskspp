@@ -21,6 +21,7 @@
         <module>Easy_Tasks</module>
         <module>STasks</module>
         <module>Sort</module>
+        <module>Addresses</module>
     </modules>
 
     <build>
