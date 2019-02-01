@@ -23,6 +23,7 @@
         <module>Sort</module>
         <module>Addresses</module>
         <module>Graphs</module>
+        <module>Calculator</module>
     </modules>
 
     <build>
