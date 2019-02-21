@@ -14,16 +14,8 @@
 
 
     <modules>
-        <module>Intro</module>
-        <module>SharpLabz</module>
-        <module>Without_IF</module>
-        <module>Puddles</module>
-        <module>Easy_Tasks</module>
-        <module>STasks</module>
-        <module>Sort</module>
-        <module>Addresses</module>
-        <module>Graphs</module>
-        <module>Calculator</module>
+        <module>OOP_Java</module>
+        <module>PP_Tasks</module>
     </modules>
 
     <build>

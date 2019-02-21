@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>psuti.pp</groupId>
-        <artifactId>taskspp</artifactId>
+        <artifactId>PP_Tasks</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
