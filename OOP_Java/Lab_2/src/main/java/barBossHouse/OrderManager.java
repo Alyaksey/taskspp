@@ -1,5 +1,6 @@
 package barBossHouse;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class OrderManager {
@@ -58,24 +59,24 @@ public class OrderManager {
      * Метод, возвращающий массив номеров свободных столиков.
      */
     public int[] freeTableNumbers() {
-        return getTableNumbers(o -> o == null);
+        return getTableNumbers(Objects::isNull);
     }
 
     /**
      * Метод, возвращающий массив номеров занятых столиков.
      */
     public int[] busyTableNumbers() {
-        return getTableNumbers(o -> o != null);
+        return getTableNumbers(Objects::nonNull);
     }
 
     /**
      * Метод, возвращающий массив имеющихся на данный момент заказов
      */
     public Order[] getOrders() {
-        Order[] orders = new Order[tablesCount(o -> o != null)];
+        Order[] orders = new Order[tablesCount(Objects::nonNull)];
         int j = 0;
         for (int i = 0; i < this.orders.length; i++) {
-            if (this.orders != null)
+            if (this.orders[i] != null)
                 orders[j++] = this.orders[i];
         }
         return orders;
@@ -86,8 +87,8 @@ public class OrderManager {
      */
     public double orderCostSummary() {
         double cost = 0.0;
+        Order[] orders = getOrders();
         for (int i = 0; i < orders.length; i++) {
-            if (orders[i] != null)
                 cost += orders[i].costTotal();
         }
         return cost;
@@ -99,6 +100,7 @@ public class OrderManager {
      */
     public int dishQuantity(String dishName) {
         int count = 0;
+        Order[] orders = getOrders();
         for (int i = 0; i < orders.length; i++) {
             count += orders[i].dishQuantity(dishName);
         }

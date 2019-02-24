@@ -5,6 +5,7 @@ public class Order {
     private int size;
 
     private static final int DEFAULT_CAPACITY = 16;
+    private static final int DEFAULT_SIZE = 0;
 
     /**
      * Конструктор, не принимающий параметров, инициирующий массив из 16 элементов (сами элементы
@@ -12,6 +13,7 @@ public class Order {
      */
     public Order() {
         this(DEFAULT_CAPACITY);
+        size = DEFAULT_SIZE;
     }
 
     /**
@@ -20,6 +22,7 @@ public class Order {
      */
     public Order(int capacity) {
         dishes = new Dish[capacity];
+        size = DEFAULT_SIZE;
     }
 
     /**
@@ -27,6 +30,7 @@ public class Order {
      */
     public Order(Dish[] dishes) {
         this.dishes = dishes;
+        size = dishes.length;
     }
 
     /**
@@ -34,13 +38,12 @@ public class Order {
      * возвращает истину после выполнения операции добавления элемента.
      */
     public boolean add(Dish dish) {
-        if (size >= dishes.length) {
+        if (size == dishes.length) {
             Dish[] newDishes = new Dish[dishes.length * 2];
             System.arraycopy(dishes, 0, newDishes, 0, dishes.length);
             dishes = newDishes;
         }
-        dishes[size] = dish;
-        size++;
+        dishes[size++] = dish;
         return true;
     }
 
@@ -53,7 +56,6 @@ public class Order {
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
                 shiftArray(i);
-                size--;
                 return true;
             }
         }
@@ -69,7 +71,6 @@ public class Order {
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
                 shiftArray(i);
-                size--;
                 count++;
             }
         }
@@ -97,9 +98,8 @@ public class Order {
      */
     public double costTotal() {
         double costTotal = 0.0;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
             costTotal += dishes[i].getCost();
-        }
         return costTotal;
     }
 
@@ -142,8 +142,9 @@ public class Order {
     }
 
     private void shiftArray(int index) {
-        System.arraycopy(dishes, index + 1, dishes, index, dishes.length - index - 1);
-        dishes[dishes.length - 1] = null;
+        System.arraycopy(dishes, index + 1, dishes, index, size - index - 1);
+        dishes[size - 1] = null;
+        size--;
     }
 
     private boolean containsDuplicates(String[] names, int count) {
