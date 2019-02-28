@@ -21,6 +21,7 @@ public class Order {
      * элементов (сами элементы имеют значение null).
      */
     public Order(int capacity) {
+        //todo capacity !=0
         dishes = new Dish[capacity];
         size = DEFAULT_SIZE;
     }
@@ -29,7 +30,7 @@ public class Order {
      * Конструктор, принимающий массив блюд.
      */
     public Order(Dish[] dishes) {
-        this.dishes = dishes;
+        this.dishes = dishes; // todo copy elements
         size = dishes.length;
     }
 
@@ -71,7 +72,7 @@ public class Order {
         int count = 0;
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
-                shiftArray(i);
+                shiftArray(i); //todo многократные сдвиги одних и тех же эелементов
                 size--;
                 count++;
             }
