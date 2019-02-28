@@ -56,6 +56,7 @@ public class Order {
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
                 shiftArray(i);
+                size--;
                 return true;
             }
         }
@@ -71,6 +72,7 @@ public class Order {
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
                 shiftArray(i);
+                size--;
                 count++;
             }
         }
@@ -144,7 +146,6 @@ public class Order {
     private void shiftArray(int index) {
         System.arraycopy(dishes, index + 1, dishes, index, size - index - 1);
         dishes[size - 1] = null;
-        size--;
     }
 
     private boolean containsDuplicates(String[] names, int count) {
