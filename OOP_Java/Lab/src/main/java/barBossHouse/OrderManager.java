@@ -87,8 +87,9 @@ public class OrderManager {
      */
     public double orderCostSummary() {
         double cost = 0.0;
-        Order[] orders = getOrders(); //todo нафиг, просто добавь условие в цикл
+        //Order[] orders = getOrders(); //todo нафиг, просто добавь условие в цикл+
         for (int i = 0; i < orders.length; i++) {
+            if (orders[i] != null)
                 cost += orders[i].costTotal();
         }
         return cost;
@@ -100,9 +101,10 @@ public class OrderManager {
      */
     public int dishQuantity(String dishName) {
         int count = 0;
-        Order[] orders = getOrders();//todo нафиг, просто добавь условие в цикл
+        //Order[] orders = getOrders();//todo нафиг, просто добавь условие в цикл+
         for (int i = 0; i < orders.length; i++) {
-            count += orders[i].dishQuantity(dishName);
+            if (orders[i] != null)
+                count += orders[i].dishQuantity(dishName);
         }
         return count;
     }

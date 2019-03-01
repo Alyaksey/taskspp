@@ -21,8 +21,11 @@ public class Order {
      * элементов (сами элементы имеют значение null).
      */
     public Order(int capacity) {
-        //todo capacity !=0
-        dishes = new Dish[capacity];
+        //todo capacity !=0+
+        if (capacity != 0) {
+            dishes = new Dish[capacity];
+        } else
+            dishes = new Dish[DEFAULT_CAPACITY];
         size = DEFAULT_SIZE;
     }
 
@@ -30,7 +33,9 @@ public class Order {
      * Конструктор, принимающий массив блюд.
      */
     public Order(Dish[] dishes) {
-        this.dishes = dishes; // todo copy elements
+        //this.dishes = dishes; //todo copy elements+
+        this.dishes = new Dish[dishes.length];
+        System.arraycopy(dishes, 0, this.dishes, 0, dishes.length);
         size = dishes.length;
     }
 
@@ -70,13 +75,18 @@ public class Order {
      */
     public int removeAll(String dishName) {
         int count = 0;
+        Dish[] newDishes = new Dish[dishes.length];
         for (int i = 0; i < size; i++) {
             if (dishName.equals(dishes[i].getName())) {
-                shiftArray(i); //todo многократные сдвиги одних и тех же эелементов
-                size--;
+                //shiftArray(i); //todo многократные сдвиги одних и тех же эелементов+
+                dishes[i] = null;
                 count++;
             }
+            if (dishes[i] != null)
+                newDishes[i - count] = dishes[i];
         }
+        dishes = newDishes;
+        size -= count;
         return count;
     }
 

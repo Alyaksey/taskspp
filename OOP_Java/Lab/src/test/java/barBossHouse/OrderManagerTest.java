@@ -37,7 +37,7 @@ public class OrderManagerTest {
         dishes[1] = new Dish(175.34, "Пюре", "С отбивной");
         Order order = new Order(dishes);
         orderManager.add(order, 0);
-        assertSame(order, orderManager.getOrder(0));
+        assertEquals(order, orderManager.getOrder(0));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class OrderManagerTest {
         expectedOrders[1] = orderManager.getOrder(3);
         expectedOrders[2] = orderManager.getOrder(5);
         for (int i = 0; i < expectedOrders.length; i++) {
-            assertSame(expectedOrders[i],orderManager.getOrders()[i]);
+            assertEquals(expectedOrders[i],orderManager.getOrders()[i]);
         }
     }
 

@@ -10,9 +10,6 @@ import static org.junit.Assert.*;
 public class OrderTest {
     private Order order;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Before
     public void setUp() throws Exception {
         Dish[] dishes = new Dish[6];
@@ -56,8 +53,7 @@ public class OrderTest {
     public void getDishes() {
         order.add(new Dish(604.32, "Стейк", "Medium rare"));
         assertEquals("Стейк", order.getDishes()[6].getName());
-        thrown.expect(ArrayIndexOutOfBoundsException.class);
-        order.getDishes()[7].getName();
+        assertEquals(7, order.getDishes().length);
     }
 
     @Test
