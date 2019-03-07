@@ -86,8 +86,7 @@ public class OrderManager {
      * Метод, возвращающий суммарную стоимость имеющихся на данный момент заказов.
      */
     public double orderCostSummary() {
-        double cost = 0.0;
-        //Order[] orders = getOrders(); //todo нафиг, просто добавь условие в цикл+
+        double orderCostSummary = 0.0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
                 cost += orders[i].costTotal();
@@ -100,8 +99,7 @@ public class OrderManager {
      * заданного блюда по его имени. Принимает имя блюда в качестве параметра.
      */
     public int dishQuantity(String dishName) {
-        int count = 0;
-        //Order[] orders = getOrders();//todo нафиг, просто добавь условие в цикл+
+        int dishQuantity = 0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
                 count += orders[i].dishQuantity(dishName);
@@ -110,7 +108,7 @@ public class OrderManager {
     }
 
     private int tablesCount(Predicate<Order> predicate) {
-        int count = 0;
+        int tablesCount = 0;
         for (int i = 0; i < orders.length; i++) {
             if (predicate.test(orders[i]))
                 count++;
@@ -119,7 +117,7 @@ public class OrderManager {
     }
 
     private int[] getTableNumbers(Predicate<Order> predicate) {
-        int count = tablesCount(predicate);
+        int tablesCount = tablesCount(predicate);
         int[] tableNumbers = new int[count];
         int j = 0;
         for (int i = 0; i < orders.length; i++) {
