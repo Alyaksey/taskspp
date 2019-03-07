@@ -12,7 +12,7 @@
     <artifactId>OOP_Java</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>Lab_2</module>
+        <module>Lab</module>
     </modules>
 
 

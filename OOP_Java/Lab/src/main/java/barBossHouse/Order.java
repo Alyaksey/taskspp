@@ -5,7 +5,6 @@ public class Order {
     private int size;
 
     private static final int DEFAULT_CAPACITY = 16;
-    private static final int DEFAULT_SIZE = 0;
 
     /**
      * Конструктор, не принимающий параметров, инициирующий массив из 16 элементов (сами элементы
@@ -13,7 +12,7 @@ public class Order {
      */
     public Order() {
         this(DEFAULT_CAPACITY);
-        size = DEFAULT_SIZE;
+        size = 0;
     }
 
     /**
@@ -26,7 +25,7 @@ public class Order {
             dishes = new Dish[capacity];
         } else
             dishes = new Dish[DEFAULT_CAPACITY];
-        size = DEFAULT_SIZE;
+        size = 0;
     }
 
     /**
