@@ -25,4 +25,5 @@ public final class Dish extends MenuItem {
     public int hashCode() {
         return super.hashCode();
     }
+
 }

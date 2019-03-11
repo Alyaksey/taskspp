@@ -22,7 +22,6 @@
         <module>Addresses</module>
         <module>Graphs</module>
         <module>Calculator</module>
-        <module>TaskManager</module>
     </modules>
 
 </project>
