@@ -1,68 +1,28 @@
 package barBossHouse;
 
-public class Dish {
-    private double cost;
-    private String name;
-    private String description;
-
-    private static final double DEFAULT_COST = 0.0;
-
-    /**
-     * Конструктор, принимающий два параметра – название и описание блюда. Стоимость при этом
-     * инициализируется значением 0
-     */
-    public Dish(String name, String description) {
-        this(DEFAULT_COST, name, description);
+public final class Dish extends MenuItem {
+    protected Dish(String name, String description) {
+        super(name, description);
     }
 
-    /**
-     * Конструктор, принимающий три параметра – стоимость, название и описание блюда.
-     */
-    public Dish(double cost, String name, String description) {
-        this.cost = cost;
-        this.name = name;
-        this.description = description;
+    protected Dish(double cost, String name, String description) {
+        super(cost, name, description);
     }
 
-    /**
-     * Метод, возвращающий стоимость.
-     */
-    public double getCost() {
-        return cost;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Dish: ").append(super.toString()).append(' ').append(getDescription());
+        return sb.toString();
     }
 
-    /**
-     * Метод, устанавливающий новое значение стоимости.
-     */
-    public void setCost(double cost) {
-        this.cost = cost;
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
-    /**
-     * Метод, возвращающий название.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Метод, устанавливающий новое значение названия
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Метод, возвращающий описание.
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * устанавливающий новое значение описания.
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

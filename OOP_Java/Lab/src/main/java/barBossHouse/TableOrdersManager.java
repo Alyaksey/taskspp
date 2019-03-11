@@ -3,15 +3,15 @@ package barBossHouse;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public class OrderManager {
+public class TableOrdersManager {
     private Order[] orders;
 
     /**
      * Конструктор, принимающий один параметр – число столиков, инициализирующий массив
      * соответствующим числом элементов.
      */
-    public OrderManager(int tableCount) {
-        orders = new Order[tableCount];
+    public TableOrdersManager(int tableCount) {
+        orders = new TableOrder[tableCount];
     }
 
     /**
@@ -32,16 +32,38 @@ public class OrderManager {
     /**
      * Метод добавления блюда к заказу. В качестве параметра принимает номер столика и блюдо.
      */
-    public void addDish(Dish dish, int tableNumber) {
-        orders[tableNumber].add(dish);
+    public void addItem(MenuItem item, int tableNumber) {
+        orders[tableNumber].add(item);
     }
 
     /**
      * Метод освобождения столика (по сути устанавливает значение соответствующего элемента
      * массива в null). В качестве параметра принимает номер столика.
      */
-    public void removeOrder(int tableNumber) {
+    public void remove(int tableNumber) {
         orders[tableNumber] = null;
+    }
+
+    public int remove(Order order) {
+        for (int i = 0; i < orders.length; i++) {
+            if (order.equals(orders[i])) {
+                orders[i] = null;
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int removeAll(Order order) {
+        int removedOrdersCount = 0;
+        for (int i = 0; i < orders.length; i++) {
+            if (order.equals(orders[i])) {
+                remove(i);
+                removedOrdersCount++;
+            }
+        }
+        if (removedOrdersCount > 0) return removedOrdersCount;
+        return -1;
     }
 
     /**
@@ -73,49 +95,60 @@ public class OrderManager {
      * Метод, возвращающий массив имеющихся на данный момент заказов
      */
     public Order[] getOrders() {
-        Order[] orders = new Order[tablesCount(Objects::nonNull)];
+        Order[] tableOrders = new TableOrder[tablesCount(Objects::nonNull)];
         int j = 0;
         for (int i = 0; i < this.orders.length; i++) {
             if (this.orders[i] != null)
-                orders[j++] = this.orders[i];
+                tableOrders[j++] = this.orders[i];
         }
-        return orders;
+        return tableOrders;
     }
 
     /**
      * Метод, возвращающий суммарную стоимость имеющихся на данный момент заказов.
      */
     public double orderCostSummary() {
-        double cost = 0.0;
-        //Order[] orders = getOrders(); //todo нафиг, просто добавь условие в цикл+
+        double orderCostSummary = 0.0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
-                cost += orders[i].costTotal();
+                orderCostSummary += orders[i].costTotal();
         }
-        return cost;
+        return orderCostSummary;
     }
 
     /**
      * Метод, возвращающий общее среди всех занятых столиков количество заказанных порций
      * заданного блюда по его имени. Принимает имя блюда в качестве параметра.
      */
-    public int dishQuantity(String dishName) {
-        int count = 0;
-        //Order[] orders = getOrders();//todo нафиг, просто добавь условие в цикл+
+    public int itemsQuantity(String itemName) {
+        int itemsQuantity = 0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
-                count += orders[i].dishQuantity(dishName);
+                itemsQuantity += orders[i].itemQuantity(itemName);
         }
-        return count;
+        return itemsQuantity;
+    }
+
+    public int itemsQuantity(MenuItem item) {
+        int itemsQuantity = 0;
+        for (int i = 0; i < orders.length; i++) {
+            if (orders[i] != null)
+                itemsQuantity += orders[i].itemQuantity(item);
+        }
+        return itemsQuantity;
+    }
+
+    public int ordersQuantity() {
+        return tablesCount(Objects::nonNull);
     }
 
     private int tablesCount(Predicate<Order> predicate) {
-        int count = 0;
+        int tablesCount = 0;
         for (int i = 0; i < orders.length; i++) {
             if (predicate.test(orders[i]))
-                count++;
+                tablesCount++;
         }
-        return count;
+        return tablesCount;
     }
 
     private int[] getTableNumbers(Predicate<Order> predicate) {
