@@ -55,8 +55,7 @@ public final class Drink extends MenuItem implements Alcoholable {
         if (!super.equals(obj))
             return false;
         Drink drink = (Drink) obj;
-        return getName().equals(drink.getName()) &&
-                getCost() == drink.getCost() &&
+        return super.equals(obj) &&
                 drink.alcoholVol == alcoholVol &&
                 type.equals(drink.type);
     }

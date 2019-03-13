@@ -1,5 +1,6 @@
 package barBossHouse;
 
+import java.util.function.BiPredicate;
 
 public class InternetOrder implements Order {
     private int size;
@@ -8,14 +9,20 @@ public class InternetOrder implements Order {
     private Customer customer;
 
     public InternetOrder(MenuItem[] items, Customer customer) {
+        size = 0;
+        head = new ListNode();
+        tail = new ListNode();
+        this.customer = customer;
         for (int i = 0; i < items.length; i++) {
             add(items[i]);
         }
-        this.customer = customer;
     }
 
     public InternetOrder() {
         size = 0;
+        head = new ListNode();
+        tail = new ListNode();
+        customer = new Customer();
     }
 
     public boolean add(MenuItem item) {
@@ -29,26 +36,22 @@ public class InternetOrder implements Order {
         return true;
     }
 
+    private BiPredicate<Object, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
+    private BiPredicate<Object, MenuItem> areItemsEqual = (firstItem, secondItem) -> firstItem.equals(secondItem);
+
     public boolean remove(String itemName) {
-        ListNode currentNode = head;
-        ListNode previousNode = null;
-        while (currentNode != null) {
-            if (itemName.equals(currentNode.getValue().getName())) {
-                removeNode(currentNode, previousNode);
-                size--;
-                return true;
-            }
-            previousNode = currentNode;
-            currentNode = currentNode.getNext();
-        }
-        return false;
+        return remove(areNamesEqual, itemName);
     }
 
     public boolean remove(MenuItem item) {
+        return remove(areItemsEqual, item);
+    }
+
+    private boolean remove(BiPredicate<Object, MenuItem> biPredicate, Object object) {
         ListNode currentNode = head;
         ListNode previousNode = null;
         while (currentNode != null) {
-            if (item.equals(currentNode.getValue())) {
+            if (biPredicate.test(object, currentNode.getValue())) {
                 removeNode(currentNode, previousNode);
                 size--;
                 return true;
@@ -60,27 +63,19 @@ public class InternetOrder implements Order {
     }
 
     public int removeAll(String itemName) {
-        ListNode currentNode = head;
-        ListNode previousNode = null;
-        int removedItemsCount = 0;
-        while (currentNode != null) {
-            if (itemName.equals(currentNode.getValue().getName())) {
-                removeNode(currentNode, previousNode);
-                size--;
-                removedItemsCount++;
-            }
-            previousNode = currentNode;
-            currentNode = currentNode.getNext();
-        }
-        return removedItemsCount;
+        return removeAll(areNamesEqual, itemName);
     }
 
     public int removeAll(MenuItem item) {
+        return removeAll(areItemsEqual, item);
+    }
+
+    private int removeAll(BiPredicate<Object, MenuItem> biPredicate, Object object) {
         ListNode currentNode = head;
         ListNode previousNode = null;
         int removedItemsCount = 0;
         while (currentNode != null) {
-            if (item.equals(currentNode.getValue())) {
+            if (biPredicate.test(object, currentNode.getValue())) {
                 removeNode(currentNode, previousNode);
                 size--;
                 removedItemsCount++;
@@ -117,21 +112,18 @@ public class InternetOrder implements Order {
     }
 
     public int itemQuantity(String itemName) {
-        int itemQuantity = 0;
-        ListNode currentNode = head;
-        while (currentNode != null) {
-            if (itemName.equals(currentNode.getValue().getName()))
-                itemQuantity++;
-            currentNode = currentNode.getNext();
-        }
-        return itemQuantity;
+        return itemQuantity(areNamesEqual,itemName);
     }
 
     public int itemQuantity(MenuItem item) {
+        return itemQuantity(areItemsEqual,item);
+    }
+
+    private int itemQuantity(BiPredicate<Object, MenuItem> biPredicate, Object object) {
         int itemQuantity = 0;
         ListNode currentNode = head;
         while (currentNode != null) {
-            if (item.equals(currentNode.getValue()))
+            if (biPredicate.test(object,currentNode.getValue()))
                 itemQuantity++;
             currentNode = currentNode.getNext();
         }
@@ -140,10 +132,11 @@ public class InternetOrder implements Order {
 
     public String[] itemsNames() {
         String[] names = new String[size];
-        MenuItem[] items = getItems();
+        ListNode currentNode = head;
         int uniqueNamesCount = 0;
-        for (int i = 0; i < items.length; i++) {
-            names[uniqueNamesCount] = items[i].getName();
+        while (currentNode != null) {
+            names[uniqueNamesCount] = currentNode.getValue().getName();
+            currentNode = currentNode.getNext();
             if (!containsDuplicates(names, uniqueNamesCount))
                 uniqueNamesCount++;
         }
@@ -171,7 +164,7 @@ public class InternetOrder implements Order {
         StringBuilder sb = new StringBuilder();
         sb.append("InternetOrder:\n").append(customer.toString()).append("\n").append(size).append("\n");
         ListNode currentNode = head;
-        while (currentNode != null){
+        while (currentNode != null) {
             sb.append(currentNode.value.toString()).append("\n");
         }
         return sb.toString();
@@ -200,7 +193,7 @@ public class InternetOrder implements Order {
         int hashCode = customer.hashCode() ^ Integer.hashCode(size);
         ListNode currentNode = head;
         while (currentNode != null) {
-            hashCode ^= currentNode.value.hashCode();
+            hashCode ^= currentNode.getValue().hashCode();
             currentNode = currentNode.getNext();
         }
         return hashCode;
@@ -261,6 +254,9 @@ public class InternetOrder implements Order {
     private class ListNode {
         private ListNode next;
         private MenuItem value;
+
+        public ListNode() {
+        }
 
         public ListNode(MenuItem value) {
             this.value = value;

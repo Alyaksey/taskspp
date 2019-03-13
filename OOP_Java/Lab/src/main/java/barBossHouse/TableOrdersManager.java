@@ -1,9 +1,10 @@
 package barBossHouse;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class TableOrdersManager {
+public class TableOrdersManager implements OrdersManager {
     private Order[] orders;
 
     /**
@@ -47,7 +48,7 @@ public class TableOrdersManager {
     public int remove(Order order) {
         for (int i = 0; i < orders.length; i++) {
             if (order.equals(orders[i])) {
-                orders[i] = null;
+                remove(i);
                 return i;
             }
         }
@@ -107,8 +108,8 @@ public class TableOrdersManager {
     /**
      * Метод, возвращающий суммарную стоимость имеющихся на данный момент заказов.
      */
-    public double orderCostSummary() {
-        double orderCostSummary = 0.0;
+    public int ordersCostSummary() {
+        int orderCostSummary = 0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
                 orderCostSummary += orders[i].costTotal();
@@ -121,25 +122,24 @@ public class TableOrdersManager {
      * заданного блюда по его имени. Принимает имя блюда в качестве параметра.
      */
     public int itemsQuantity(String itemName) {
-        int itemsQuantity = 0;
-        for (int i = 0; i < orders.length; i++) {
-            if (orders[i] != null)
-                itemsQuantity += orders[i].itemQuantity(itemName);
-        }
-        return itemsQuantity;
+        return itemsQuantity(order -> order.itemQuantity(itemName));
     }
 
     public int itemsQuantity(MenuItem item) {
+        return itemsQuantity(order -> order.itemQuantity(item));
+    }
+
+    private int itemsQuantity(Function<Order, Integer> function) {
         int itemsQuantity = 0;
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] != null)
-                itemsQuantity += orders[i].itemQuantity(item);
+                itemsQuantity += function.apply(orders[i]);
         }
         return itemsQuantity;
     }
 
     public int ordersQuantity() {
-        return tablesCount(Objects::nonNull);
+        return getOrders().length;
     }
 
     private int tablesCount(Predicate<Order> predicate) {

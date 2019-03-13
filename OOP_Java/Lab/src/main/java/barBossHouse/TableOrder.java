@@ -1,5 +1,8 @@
 package barBossHouse;
 
+import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
+
 public class TableOrder implements Order {
     private Customer customer;
     private MenuItem[] items;
@@ -13,7 +16,7 @@ public class TableOrder implements Order {
      * имеют значение null).
      */
     public TableOrder() {
-        this(DEFAULT_CAPACITY, Customer.MATURE_UNKNOWN_CUSTOMER);
+        this(DEFAULT_CAPACITY, new Customer());
         size = DEFAULT_SIZE;
     }
 
@@ -60,22 +63,22 @@ public class TableOrder implements Order {
      * параметра). Если блюд с заданным названием несколько, удаляется первое найденное. Возвращает
      * логическое значение (true, если элемент был удален).
      */
+    private BiPredicate<Object, Integer> areNamesEqual = (name, i) -> name.equals(items[i].getName());
+    private BiPredicate<Object, Integer> areItemsEqual = (item, i) -> item.equals(items[i]);
+
     @Override
     public boolean remove(String itemName) {
-        for (int i = 0; i < size; i++) {
-            if (itemName.equals(items[i].getName())) {
-                shiftArray(i);
-                size--;
-                return true;
-            }
-        }
-        return false;
+        return remove(areNamesEqual, itemName);
     }
 
     @Override
     public boolean remove(MenuItem item) {
+        return remove(areItemsEqual, item);
+    }
+
+    private boolean remove(BiPredicate<Object, Integer> biPredicate, Object object) {
         for (int i = 0; i < size; i++) {
-            if (item.equals(items[i])) {
+            if (biPredicate.test(object, i)) {
                 shiftArray(i);
                 size--;
                 return true;
@@ -89,28 +92,20 @@ public class TableOrder implements Order {
      * параметра). Возвращает число удаленных элементов.
      */
     @Override
-    public int removeAll(String menuItemName) {
-        int removedItemsCount = 0;
-        MenuItem[] newItems = new MenuItem[items.length];
-        for (int i = 0; i < size; i++) {
-            if (menuItemName.equals(items[i].getName())) {
-                items[i] = null;
-                removedItemsCount++;
-            }
-            if (items[i] != null)
-                newItems[i - removedItemsCount] = items[i];
-        }
-        items = newItems;
-        size -= removedItemsCount;
-        return removedItemsCount;
+    public int removeAll(String itemName) {
+        return removeAll(areNamesEqual,itemName);
     }
 
     @Override
-    public int removeAll(MenuItem menuItem) {
+    public int removeAll(MenuItem item) {
+        return removeAll(areItemsEqual,item);
+    }
+
+    private int removeAll(BiPredicate<Object, Integer> biPredicate, Object object){
         int removedItemsCount = 0;
         MenuItem[] newItems = new MenuItem[items.length];
         for (int i = 0; i < size; i++) {
-            if (menuItem.equals(items[i])) {
+            if (biPredicate.test(object,i)) {
                 items[i] = null;
                 removedItemsCount++;
             }
@@ -154,23 +149,22 @@ public class TableOrder implements Order {
     /**
      * Метод, возвращающий число заказанных блюд (принимает название блюда в качестве параметра)
      */
+
     @Override
     public int itemQuantity(String itemName) {
-        int itemQuantity = 0;
-        for (int i = 0; i < size; i++) {
-            if (itemName.equals(items[i].getName())) {
-                itemQuantity++;
-            }
-        }
-        return itemQuantity;
+        return itemQuantity(areNamesEqual, itemName);
     }
 
     @Override
     public int itemQuantity(MenuItem item) {
+        return itemQuantity(areItemsEqual, item);
+    }
+
+    private int itemQuantity(BiPredicate<Object, Integer> biPredicate, Object object) {
         int itemQuantity = 0;
         for (int i = 0; i < size; i++) {
-            if (item.equals(items[i]))
-                itemQuantity++;
+            if (biPredicate.test(object, i)) ;
+            itemQuantity++;
         }
         return itemQuantity;
     }
