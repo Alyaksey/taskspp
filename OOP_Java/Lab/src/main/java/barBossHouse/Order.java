@@ -1,6 +1,13 @@
 package barBossHouse;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public interface Order {
+    LocalDateTime getDateTime();
+
+    void setDateTime(LocalDateTime dateTime);
+
     boolean add(MenuItem item);
 
     String[] itemsNames();

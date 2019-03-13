@@ -1,12 +1,14 @@
 package barBossHouse;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.BiPredicate;
-import java.util.function.BinaryOperator;
 
 public class TableOrder implements Order {
     private Customer customer;
     private MenuItem[] items;
     private int size;
+    private LocalDateTime dateTime;
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final int DEFAULT_SIZE = 0;
@@ -18,6 +20,7 @@ public class TableOrder implements Order {
     public TableOrder() {
         this(DEFAULT_CAPACITY, new Customer());
         size = DEFAULT_SIZE;
+        dateTime = LocalDateTime.now();
     }
 
     /**
@@ -25,12 +28,15 @@ public class TableOrder implements Order {
      * элементов (сами элементы имеют значение null).
      */
     public TableOrder(int capacity, Customer customer) {
+        if (capacity < 0)
+            throw new NegativeSizeException("Array's capacity cannot be negative");
         if (capacity != 0) {
             items = new MenuItem[capacity];
         } else
             items = new MenuItem[DEFAULT_CAPACITY];
         this.customer = customer;
         size = DEFAULT_SIZE;
+        dateTime = LocalDateTime.now();
     }
 
     /**
@@ -41,6 +47,15 @@ public class TableOrder implements Order {
         this.customer = customer;
         System.arraycopy(items, 0, this.items, 0, items.length);
         size = items.length;
+        dateTime = LocalDateTime.now();
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     /**
@@ -49,6 +64,11 @@ public class TableOrder implements Order {
      */
     @Override
     public boolean add(MenuItem item) {
+        if (item instanceof Drink) {
+            Drink drink = (Drink) item;
+            if (drink.isAlcoholicDrink() && (customer.getAge() < 18 || LocalDateTime.now().getHour() > 22))
+                throw new UnlawfulActionException("You're not allowed to buy an alcohol");
+        }
         if (size == items.length) {
             MenuItem[] newItems = new MenuItem[items.length * 2];
             System.arraycopy(items, 0, newItems, 0, items.length);
@@ -63,8 +83,8 @@ public class TableOrder implements Order {
      * параметра). Если блюд с заданным названием несколько, удаляется первое найденное. Возвращает
      * логическое значение (true, если элемент был удален).
      */
-    private BiPredicate<Object, Integer> areNamesEqual = (name, i) -> name.equals(items[i].getName());
-    private BiPredicate<Object, Integer> areItemsEqual = (item, i) -> item.equals(items[i]);
+    private BiPredicate<String, Integer> areNamesEqual = (name, i) -> name.equals(items[i].getName());
+    private BiPredicate<MenuItem, Integer> areItemsEqual = (item, i) -> item.equals(items[i]);
 
     @Override
     public boolean remove(String itemName) {
@@ -76,7 +96,7 @@ public class TableOrder implements Order {
         return remove(areItemsEqual, item);
     }
 
-    private boolean remove(BiPredicate<Object, Integer> biPredicate, Object object) {
+    private <T> boolean remove(BiPredicate<T, Integer> biPredicate, T object) {
         for (int i = 0; i < size; i++) {
             if (biPredicate.test(object, i)) {
                 shiftArray(i);
@@ -93,19 +113,19 @@ public class TableOrder implements Order {
      */
     @Override
     public int removeAll(String itemName) {
-        return removeAll(areNamesEqual,itemName);
+        return removeAll(areNamesEqual, itemName);
     }
 
     @Override
     public int removeAll(MenuItem item) {
-        return removeAll(areItemsEqual,item);
+        return removeAll(areItemsEqual, item);
     }
 
-    private int removeAll(BiPredicate<Object, Integer> biPredicate, Object object){
+    private <T> int removeAll(BiPredicate<T, Integer> biPredicate, T object) {
         int removedItemsCount = 0;
         MenuItem[] newItems = new MenuItem[items.length];
         for (int i = 0; i < size; i++) {
-            if (biPredicate.test(object,i)) {
+            if (biPredicate.test(object, i)) {
                 items[i] = null;
                 removedItemsCount++;
             }
@@ -160,7 +180,7 @@ public class TableOrder implements Order {
         return itemQuantity(areItemsEqual, item);
     }
 
-    private int itemQuantity(BiPredicate<Object, Integer> biPredicate, Object object) {
+    private <T> int itemQuantity(BiPredicate<T, Integer> biPredicate, T object) {
         int itemQuantity = 0;
         for (int i = 0; i < size; i++) {
             if (biPredicate.test(object, i)) ;
@@ -268,7 +288,7 @@ public class TableOrder implements Order {
         if (obj == null || getClass() != obj.getClass())
             return false;
         TableOrder tableOrder = (TableOrder) obj;
-        if (customer.equals(tableOrder.customer) && size == tableOrder.size) {
+        if (customer.equals(tableOrder.customer) && size == tableOrder.size && dateTime.equals(tableOrder.dateTime)) {
             String[] itemsNames = itemsNames();
             for (int i = 0; i < itemsNames.length; i++) {
                 if (itemQuantity(itemsNames[i]) != tableOrder.itemQuantity(itemsNames[i]))
@@ -281,7 +301,7 @@ public class TableOrder implements Order {
 
     @Override
     public int hashCode() {
-        int hashCode = customer.hashCode() ^ Integer.hashCode(size);
+        int hashCode = customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode();
         for (int i = 0; i < size; i++) {
             hashCode ^= items[i].hashCode();
         }

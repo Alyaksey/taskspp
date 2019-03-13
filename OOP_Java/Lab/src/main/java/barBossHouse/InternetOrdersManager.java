@@ -1,5 +1,10 @@
 package barBossHouse;
 
+import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class InternetOrdersManager implements OrdersManager {
@@ -8,18 +13,22 @@ public class InternetOrdersManager implements OrdersManager {
     private int size;
 
     public InternetOrdersManager() {
-        head = new QueueNode();
-        tail = new QueueNode();
+        head = null;
+        tail = null;
         size = 0;
     }
 
-    public InternetOrdersManager(MenuItem[] items) {
-        head = new QueueNode();
-        tail = new QueueNode();
+    public InternetOrdersManager(Order[] orders) throws AlreadyAddedException {
+        head = null;
+        tail = null;
         size = 0;
+        for (int i = 0; i < orders.length; i++) {
+            add(orders[i]);
+        }
     }
 
-    public boolean add(Order order) {
+    public boolean add(Order order) throws AlreadyAddedException {
+        checkDuplicates(order);
         QueueNode node = new QueueNode(order);
         if (head == null) {
             head = node;
@@ -31,6 +40,15 @@ public class InternetOrdersManager implements OrdersManager {
         }
         size++;
         return true;
+    }
+
+    private void checkDuplicates(Order order) throws AlreadyAddedException {
+        QueueNode currentNode = head;
+        while (Objects.nonNull(currentNode)) {
+            if (currentNode.getValue().getCustomer().equals(order.getCustomer()))
+                throw new AlreadyAddedException("This order is already exists");
+            currentNode = currentNode.getNext();
+        }
     }
 
     public Order order() {
@@ -66,10 +84,11 @@ public class InternetOrdersManager implements OrdersManager {
         }
         return orders;
     }
+
     public int ordersCostSummary() {
         int ordersCostSummary = 0;
         QueueNode currentNode = head;
-        while (currentNode != null){
+        while (currentNode != null) {
             ordersCostSummary += currentNode.getValue().costTotal();
             currentNode = currentNode.getNext();
         }
@@ -83,10 +102,11 @@ public class InternetOrdersManager implements OrdersManager {
     public int itemsQuantity(MenuItem item) {
         return itemsQuantity(order -> order.itemQuantity(item));
     }
-    private  int itemsQuantity(Function<Order,Integer> function){
+
+    private int itemsQuantity(Function<Order, Integer> function) {
         int itemsQuantity = 0;
         QueueNode currentNode = head;
-        while (currentNode != null){
+        while (currentNode != null) {
             itemsQuantity += function.apply(currentNode.getValue());
             currentNode = currentNode.getNext();
         }
@@ -95,6 +115,35 @@ public class InternetOrdersManager implements OrdersManager {
 
     public int ordersQuantity() {
         return size;
+    }
+
+    @Override
+    public int ordersQuantity(LocalDate localDate) {
+        return size;
+    }
+
+    private BiPredicate<LocalDate, Order> areDatesEqual = (date, order) -> date.equals(order.getDateTime().toLocalDate());
+    private BiPredicate<Customer, Order> areCustomersEqual = (customer, order) -> customer.equals(order.getCustomer());
+
+    @Override
+    public List<Order> getOrders(LocalDate localDate) {
+        return getOrders(areDatesEqual, localDate);
+    }
+
+    @Override
+    public List<Order> getOrders(Customer customer) {
+        return getOrders(areCustomersEqual, customer);
+    }
+
+    private <T> List<Order> getOrders(BiPredicate<T, Order> biPredicate, T object) {
+        List<Order> orders = new LinkedList<>();
+        QueueNode currentNode = head;
+        while (currentNode != null) {
+            if (biPredicate.test(object, currentNode.getValue()))
+                orders.add(currentNode.getValue());
+            currentNode = currentNode.getNext();
+        }
+        return orders;
     }
 
     private class QueueNode {

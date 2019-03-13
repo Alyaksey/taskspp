@@ -1,5 +1,6 @@
 package barBossHouse;
 
+import java.time.LocalDateTime;
 import java.util.function.BiPredicate;
 
 public class InternetOrder implements Order {
@@ -7,25 +8,41 @@ public class InternetOrder implements Order {
     private ListNode head;
     private ListNode tail;
     private Customer customer;
+    private LocalDateTime dateTime;
 
     public InternetOrder(MenuItem[] items, Customer customer) {
         size = 0;
-        head = new ListNode();
-        tail = new ListNode();
+        head = null;
+        tail = null;
         this.customer = customer;
         for (int i = 0; i < items.length; i++) {
             add(items[i]);
         }
+        dateTime = LocalDateTime.now();
     }
 
     public InternetOrder() {
         size = 0;
-        head = new ListNode();
-        tail = new ListNode();
+        head = null;
+        tail = null;
         customer = new Customer();
+        dateTime = LocalDateTime.now();
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public boolean add(MenuItem item) {
+        if (item instanceof Drink) {
+            Drink drink = (Drink) item;
+            if (drink.isAlcoholicDrink() && (customer.getAge() < 18 || dateTime.now().getHour() > 22))
+                throw new UnlawfulActionException("You're not allowed to buy an alcohol");
+        }
         ListNode node = new ListNode(item);
         if (head == null) {
             head = node;
@@ -36,8 +53,8 @@ public class InternetOrder implements Order {
         return true;
     }
 
-    private BiPredicate<Object, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
-    private BiPredicate<Object, MenuItem> areItemsEqual = (firstItem, secondItem) -> firstItem.equals(secondItem);
+    private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
+    private BiPredicate<MenuItem, MenuItem> areItemsEqual = (firstItem, secondItem) -> firstItem.equals(secondItem);
 
     public boolean remove(String itemName) {
         return remove(areNamesEqual, itemName);
@@ -47,7 +64,7 @@ public class InternetOrder implements Order {
         return remove(areItemsEqual, item);
     }
 
-    private boolean remove(BiPredicate<Object, MenuItem> biPredicate, Object object) {
+    private <T> boolean remove(BiPredicate<T, MenuItem> biPredicate, T object) {
         ListNode currentNode = head;
         ListNode previousNode = null;
         while (currentNode != null) {
@@ -70,7 +87,7 @@ public class InternetOrder implements Order {
         return removeAll(areItemsEqual, item);
     }
 
-    private int removeAll(BiPredicate<Object, MenuItem> biPredicate, Object object) {
+    private <T> int removeAll(BiPredicate<T, MenuItem> biPredicate, T object) {
         ListNode currentNode = head;
         ListNode previousNode = null;
         int removedItemsCount = 0;
@@ -112,18 +129,18 @@ public class InternetOrder implements Order {
     }
 
     public int itemQuantity(String itemName) {
-        return itemQuantity(areNamesEqual,itemName);
+        return itemQuantity(areNamesEqual, itemName);
     }
 
     public int itemQuantity(MenuItem item) {
-        return itemQuantity(areItemsEqual,item);
+        return itemQuantity(areItemsEqual, item);
     }
 
-    private int itemQuantity(BiPredicate<Object, MenuItem> biPredicate, Object object) {
+    private <T> int itemQuantity(BiPredicate<T, MenuItem> biPredicate, T object) {
         int itemQuantity = 0;
         ListNode currentNode = head;
         while (currentNode != null) {
-            if (biPredicate.test(object,currentNode.getValue()))
+            if (biPredicate.test(object, currentNode.getValue()))
                 itemQuantity++;
             currentNode = currentNode.getNext();
         }
@@ -165,7 +182,8 @@ public class InternetOrder implements Order {
         sb.append("InternetOrder:\n").append(customer.toString()).append("\n").append(size).append("\n");
         ListNode currentNode = head;
         while (currentNode != null) {
-            sb.append(currentNode.value.toString()).append("\n");
+            sb.append(currentNode.getValue().toString()).append("\n");
+            currentNode = currentNode.getNext();
         }
         return sb.toString();
     }
@@ -177,7 +195,7 @@ public class InternetOrder implements Order {
         if (obj == null || getClass() != obj.getClass())
             return false;
         InternetOrder internetOrder = (InternetOrder) obj;
-        if (customer.equals(internetOrder.customer) && size == internetOrder.size) {
+        if (customer.equals(internetOrder.customer) && size == internetOrder.size && dateTime.equals(internetOrder.dateTime)) {
             String[] itemsNames = itemsNames();
             for (int i = 0; i < itemsNames.length; i++) {
                 if (itemQuantity(itemsNames[i]) != internetOrder.itemQuantity(itemsNames[i]))
@@ -190,7 +208,7 @@ public class InternetOrder implements Order {
 
     @Override
     public int hashCode() {
-        int hashCode = customer.hashCode() ^ Integer.hashCode(size);
+        int hashCode = customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode();
         ListNode currentNode = head;
         while (currentNode != null) {
             hashCode ^= currentNode.getValue().hashCode();

@@ -28,6 +28,14 @@ public final class Address {
     }
 
     public Address(String cityName, int zipCode, String streetName, int buildingNumber, char buildingLetter, int apartmentNumber) {
+        if (zipCode < 0)
+            throw new IllegalArgumentException("Zip-code cannot be negative");
+        if (buildingNumber < 0)
+            throw new IllegalArgumentException("Building's number cannot be negative");
+        if (apartmentNumber < 0)
+            throw new IllegalArgumentException("Apartment's number cannot be negative");
+        if (!Character.isLetter(buildingLetter))
+            throw new IllegalArgumentException("Building letter must contain letter");
         this.cityName = cityName;
         this.zipCode = zipCode;
         this.streetName = streetName;
@@ -62,21 +70,9 @@ public final class Address {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Address: ");
-        if (!cityName.isEmpty())
-            sb.append(cityName);
-        if (zipCode != UNKNOWN_ZIP_CODE)
-            sb.append(' ').append(zipCode);
-        if (!streetName.isEmpty())
-            sb.append(", ").append(streetName);
-        if (buildingNumber != UNKNOWN_BUILDING_NUMBER)
-            sb.append(' ').append(buildingNumber);
-        if (buildingLetter != UNKNOWN_BUILDING_LETTER)
-            sb.append(buildingLetter);
-        if (apartmentNumber != UNKNOWN_APARTMENT_NUMBER)
-            sb.append('-').append(apartmentNumber);
-        return sb.toString();
+        return String.format("Address: %s %d, %s %d %c-%d", cityName, zipCode, streetName, buildingNumber,
+                buildingLetter,
+                apartmentNumber);
     }
 
     @Override

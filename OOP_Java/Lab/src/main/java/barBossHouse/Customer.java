@@ -1,30 +1,35 @@
 package barBossHouse;
 
+import java.time.LocalDate;
+
 public final class Customer {
     private final String firstName;
     private final String secondName;
-    private final int age;
+    private final LocalDate birthDate;
     private final Address address;
 
     private static final String UNKNOWN_FIRST_NAME = "";
     private static final String UNKNOWN_SECOND_NAME = "";
-    private static final int UNKNOWN_AGE = -1;
+    private static final int NOT_MATURE_CUSTOMER_AGE = 14;
+    private static final int MATURE_CUSTOMER_AGE = 18;
 
-    public static final Customer NOT_MATURE_UNKNOWN_CUSTOMER = new Customer(14);
-    public static final Customer MATURE_UNKNOWN_CUSTOMER = new Customer(18);
+    public static final Customer NOT_MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - NOT_MATURE_CUSTOMER_AGE,1,1));
+    public static final Customer MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - MATURE_CUSTOMER_AGE,1,1));
 
     public Customer() {
-        this(UNKNOWN_FIRST_NAME, UNKNOWN_SECOND_NAME, UNKNOWN_AGE, Address.EMPTY_ADDRESS);
+        this(UNKNOWN_FIRST_NAME, UNKNOWN_SECOND_NAME, LocalDate.now(), Address.EMPTY_ADDRESS);
     }
 
-    public Customer(int age) {
-        this(UNKNOWN_FIRST_NAME, UNKNOWN_SECOND_NAME, age, Address.EMPTY_ADDRESS);
+    public Customer(LocalDate birthDate) {
+        this(UNKNOWN_FIRST_NAME, UNKNOWN_SECOND_NAME, birthDate, Address.EMPTY_ADDRESS);
     }
 
-    public Customer(String firstName, String secondName, int age, Address address) {
+    public Customer(String firstName, String secondName, LocalDate birthDate, Address address) {
+        if (birthDate.isAfter(LocalDate.now()))
+            throw new IllegalArgumentException("Are you from the future?");
         this.firstName = firstName;
         this.secondName = secondName;
-        this.age = age;
+        this.birthDate = birthDate;
         this.address = address;
     }
 
@@ -37,7 +42,7 @@ public final class Customer {
     }
 
     public int getAge() {
-        return age;
+        return LocalDate.now().getYear() - birthDate.getYear();
     }
 
     public Address getAddress() {
@@ -52,8 +57,7 @@ public final class Customer {
             sb.append(secondName);
         if (!firstName.isEmpty())
             sb.append(" ").append(firstName);
-        if (age != UNKNOWN_AGE)
-            sb.append(", ").append(age);
+            sb.append(", ").append(birthDate);
         if (!address.equals(Address.EMPTY_ADDRESS))
             sb.append(", ").append(address.toString());
         return sb.toString();
@@ -66,7 +70,7 @@ public final class Customer {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Customer customer = (Customer) obj;
-        return age == customer.age &&
+        return birthDate.equals(customer.birthDate) &&
                 firstName.equals(customer.firstName) &&
                 secondName.equals(customer.secondName) &&
                 address.equals(customer.address);
@@ -74,6 +78,6 @@ public final class Customer {
 
     @Override
     public int hashCode() {
-        return firstName.hashCode() ^ secondName.hashCode() ^ Integer.hashCode(age) ^ address.hashCode();
+        return firstName.hashCode() ^ secondName.hashCode() ^ birthDate.hashCode() ^ address.hashCode();
     }
 }

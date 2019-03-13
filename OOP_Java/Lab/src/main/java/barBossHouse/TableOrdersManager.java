@@ -1,8 +1,12 @@
 package barBossHouse;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class TableOrdersManager implements OrdersManager {
     private Order[] orders;
@@ -12,6 +16,8 @@ public class TableOrdersManager implements OrdersManager {
      * соответствующим числом элементов.
      */
     public TableOrdersManager(int tableCount) {
+        if (tableCount < 0)
+            throw new NegativeSizeException("Array's capacity cannot be negative");
         orders = new TableOrder[tableCount];
     }
 
@@ -19,7 +25,9 @@ public class TableOrdersManager implements OrdersManager {
      * Метод добавления заказа столику. В качестве параметров принимает номер столика и ссылку на
      * заказ.
      */
-    public void add(Order order, int tableNumber) {
+    public void add(Order order, int tableNumber) throws AlreadyAddedException {
+        if (Objects.nonNull(orders[tableNumber]))
+            throw new AlreadyAddedException("This table is busy");
         orders[tableNumber] = order;
     }
 
@@ -70,12 +78,12 @@ public class TableOrdersManager implements OrdersManager {
     /**
      * Метод, возвращающий номер первого найденного свободного столика
      */
-    public int freeTableNumber() {
+    public int freeTableNumber() throws NoFreeTableException {
         for (int i = 0; i < orders.length; i++) {
             if (orders[i] == null)
                 return i;
         }
-        return -1;
+        throw new NoFreeTableException("There are no free tables");
     }
 
     /**
@@ -140,6 +148,30 @@ public class TableOrdersManager implements OrdersManager {
 
     public int ordersQuantity() {
         return getOrders().length;
+    }
+
+    @Override
+    public int ordersQuantity(LocalDate localDate) {
+        return (int)Arrays.stream(orders)
+                .filter(Objects::nonNull)
+                .filter(o -> localDate.equals(o.getDateTime().toLocalDate()))
+                .count();
+    }
+
+    @Override
+    public List<Order> getOrders(LocalDate localDate) {
+        return getOrders(o -> localDate.equals(o.getDateTime().toLocalDate()));
+    }
+
+    @Override
+    public List<Order> getOrders(Customer customer) {
+        return getOrders(o -> customer.equals(o.getCustomer()));
+    }
+
+    private List<Order> getOrders(Predicate<Order> predicate) {
+        return Arrays.stream(orders).filter(Objects::nonNull)
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 
     private int tablesCount(Predicate<Order> predicate) {

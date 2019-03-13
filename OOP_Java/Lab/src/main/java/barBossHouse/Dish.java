@@ -11,9 +11,7 @@ public final class Dish extends MenuItem {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Dish: ").append(super.toString()).append(' ').append(getDescription());
-        return sb.toString();
+        return String.format("Dish: %s %s", super.toString(), getDescription());
     }
 
     @Override

@@ -21,6 +21,8 @@ public final class Drink extends MenuItem implements Alcoholable {
 
     public Drink(double cost, String name, String description, double alcoholVol, DrinkTypeEnum type) {
         super(cost, name, description);
+        if (alcoholVol > 100 || alcoholVol < 0)
+            throw new IllegalArgumentException("Alcohol volume must be between 0% and 100%");
         this.alcoholVol = alcoholVol;
         this.type = type;
     }
@@ -42,7 +44,7 @@ public final class Drink extends MenuItem implements Alcoholable {
     @Override
     public String toString() {
         return isAlcoholicDrink() ?
-                String.format("Drink: %s, %s, Alcohol: %.2f %s", type, super.toString(), alcoholVol, type) :
+                String.format("Drink: %s, %s, Alcohol: %.2f%% %s", type, super.toString(), alcoholVol, type) :
                 String.format("Drink: %s, %s", type, super.toString());
     }
 

@@ -19,6 +19,8 @@ public abstract class MenuItem {
      * Конструктор, принимающий три параметра – стоимость, название и описание блюда.
      */
     protected MenuItem(double cost, String name, String description) {
+        if (cost < 0)
+            throw new IllegalArgumentException("Cost cannot be negative");
         this.cost = cost;
         this.name = name;
         this.description = description;
