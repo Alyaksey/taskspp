@@ -47,8 +47,10 @@ public class InternetOrder implements Order {
         if (head == null) {
             head = node;
             tail = node;
-        } else
+        } else {
             tail.setNext(node);
+            tail = node;
+        }
         size++;
         return true;
     }
