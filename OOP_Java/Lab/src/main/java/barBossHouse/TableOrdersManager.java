@@ -100,6 +100,7 @@ public class TableOrdersManager implements OrdersManager {
     /**
      * Метод, возвращающий массив имеющихся на данный момент заказов
      */
+    @Override
     public Order[] getOrders() {
         Order[] tableOrders = new TableOrder[tablesCount(Objects::nonNull)];
         int j = 0;
@@ -113,6 +114,7 @@ public class TableOrdersManager implements OrdersManager {
     /**
      * Метод, возвращающий суммарную стоимость имеющихся на данный момент заказов.
      */
+    @Override
     public int ordersCostSummary() {
         int orderCostSummary = 0;
         for (int i = 0; i < orders.length; i++) {
@@ -126,10 +128,12 @@ public class TableOrdersManager implements OrdersManager {
      * Метод, возвращающий общее среди всех занятых столиков количество заказанных порций
      * заданного блюда по его имени. Принимает имя блюда в качестве параметра.
      */
+    @Override
     public int itemsQuantity(String itemName) {
         return itemsQuantity(order -> order.itemQuantity(itemName));
     }
 
+    @Override
     public int itemsQuantity(MenuItem item) {
         return itemsQuantity(order -> order.itemQuantity(item));
     }
@@ -143,6 +147,7 @@ public class TableOrdersManager implements OrdersManager {
         return itemsQuantity;
     }
 
+    @Override
     public int ordersQuantity() {
         return getOrders().length;
     }

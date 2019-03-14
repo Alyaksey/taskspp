@@ -72,6 +72,7 @@ public class InternetOrdersManager implements OrdersManager {
         }
     }
 
+    @Override
     public Order[] getOrders() {
         Order[] orders = new Order[size];
         QueueNode currentNode = head;
@@ -82,6 +83,7 @@ public class InternetOrdersManager implements OrdersManager {
         return orders;
     }
 
+    @Override
     public int ordersCostSummary() {
         int ordersCostSummary = 0;
         QueueNode currentNode = head;
@@ -92,10 +94,12 @@ public class InternetOrdersManager implements OrdersManager {
         return ordersCostSummary;
     }
 
+    @Override
     public int itemsQuantity(String itemName) {
         return itemsQuantity(order -> order.itemQuantity(itemName));
     }
 
+    @Override
     public int itemsQuantity(MenuItem item) {
         return itemsQuantity(order -> order.itemQuantity(item));
     }
@@ -110,6 +114,7 @@ public class InternetOrdersManager implements OrdersManager {
         return itemsQuantity;
     }
 
+    @Override
     public int ordersQuantity() {
         return size;
     }

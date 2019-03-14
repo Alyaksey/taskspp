@@ -29,14 +29,17 @@ public class InternetOrder implements Order {
         dateTime = LocalDateTime.now();
     }
 
+    @Override
     public LocalDateTime getDateTime() {
         return dateTime;
     }
 
+    @Override
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
+    @Override
     public boolean add(MenuItem item) {
         if (item instanceof Drink) {
             Drink drink = (Drink) item;
@@ -58,10 +61,12 @@ public class InternetOrder implements Order {
     private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
     private BiPredicate<MenuItem, MenuItem> areItemsEqual = (firstItem, secondItem) -> firstItem.equals(secondItem);
 
+    @Override
     public boolean remove(String itemName) {
         return remove(areNamesEqual, itemName);
     }
 
+    @Override
     public boolean remove(MenuItem item) {
         return remove(areItemsEqual, item);
     }
@@ -81,10 +86,12 @@ public class InternetOrder implements Order {
         return false;
     }
 
+    @Override
     public int removeAll(String itemName) {
         return removeAll(areNamesEqual, itemName);
     }
 
+    @Override
     public int removeAll(MenuItem item) {
         return removeAll(areItemsEqual, item);
     }
@@ -105,10 +112,12 @@ public class InternetOrder implements Order {
         return removedItemsCount;
     }
 
+    @Override
     public int itemsQuantity() {
         return size;
     }
 
+    @Override
     public MenuItem[] getItems() {
         MenuItem[] items = new MenuItem[size];
         ListNode currentNode = head;
@@ -120,6 +129,7 @@ public class InternetOrder implements Order {
         return items;
     }
 
+    @Override
     public double costTotal() {
         double costTotal = 0.0;
         ListNode currentNode = head;
@@ -130,10 +140,12 @@ public class InternetOrder implements Order {
         return costTotal;
     }
 
+    @Override
     public int itemQuantity(String itemName) {
         return itemQuantity(areNamesEqual, itemName);
     }
 
+    @Override
     public int itemQuantity(MenuItem item) {
         return itemQuantity(areItemsEqual, item);
     }
@@ -149,6 +161,7 @@ public class InternetOrder implements Order {
         return itemQuantity;
     }
 
+    @Override
     public String[] itemsNames() {
         String[] names = new String[size];
         ListNode currentNode = head;
@@ -164,16 +177,19 @@ public class InternetOrder implements Order {
         return uniqueNames;
     }
 
+    @Override
     public MenuItem[] sortedItemsByCostDesc() {
         MenuItem[] sortedItems = getItems();
         mergeSort(sortedItems);
         return sortedItems;
     }
 
+    @Override
     public Customer getCustomer() {
         return customer;
     }
 
+    @Override
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }

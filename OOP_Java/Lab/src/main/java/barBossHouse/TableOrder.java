@@ -49,10 +49,12 @@ public class TableOrder implements Order {
         dateTime = LocalDateTime.now();
     }
 
+    @Override
     public LocalDateTime getDateTime() {
         return dateTime;
     }
 
+    @Override
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
