@@ -1,11 +1,8 @@
 package barBossHouse;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.*;
+import java.util.function.*;
 
 public class InternetOrdersManager implements OrdersManager {
     private QueueNode head;

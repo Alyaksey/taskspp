@@ -1,12 +1,9 @@
 package barBossHouse;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 public class TableOrdersManager implements OrdersManager {
     private Order[] orders;
