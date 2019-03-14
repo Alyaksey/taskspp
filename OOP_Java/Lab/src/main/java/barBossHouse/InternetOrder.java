@@ -41,11 +41,7 @@ public class InternetOrder implements Order {
 
     @Override
     public boolean add(MenuItem item) {
-        if (item instanceof Drink) {
-            Drink drink = (Drink) item;
-            if (drink.isAlcoholicDrink() && (customer.getAge() < 18 || dateTime.now().getHour() > 22))
-                throw new UnlawfulActionException("You're not allowed to buy an alcohol");
-        }
+        checkLawless(item);
         ListNode node = new ListNode(item);
         if (head == null) {
             head = node;
@@ -59,7 +55,7 @@ public class InternetOrder implements Order {
     }
 
     private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
-    private BiPredicate<MenuItem, MenuItem> areItemsEqual = (firstItem, secondItem) -> firstItem.equals(secondItem);
+    private BiPredicate<MenuItem, MenuItem> areItemsEqual = MenuItem::equals;
 
     @Override
     public boolean remove(String itemName) {
@@ -179,6 +175,7 @@ public class InternetOrder implements Order {
 
     @Override
     public MenuItem[] sortedItemsByCostDesc() {
+        //todo можно вынести в интерфейс
         MenuItem[] sortedItems = getItems();
         mergeSort(sortedItems);
         return sortedItems;
@@ -208,6 +205,7 @@ public class InternetOrder implements Order {
 
     @Override
     public boolean equals(Object obj) {
+        //todo можно вынести в интерфейс с проверкой типа Order
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())

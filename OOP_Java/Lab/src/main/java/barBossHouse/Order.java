@@ -43,4 +43,12 @@ public interface Order {
 
     @Override
     boolean equals(Object obj);
+
+    default void checkLawless(MenuItem item) {
+        if (item instanceof Drink) {
+            Drink drink = (Drink) item;
+            if (drink.isAlcoholicDrink() && (getCustomer().getAge() < 18 || LocalDateTime.now().getHour() > 22))
+                throw new UnlawfulActionException("You're not allowed to buy an alcohol");
+        }
+    }
 }

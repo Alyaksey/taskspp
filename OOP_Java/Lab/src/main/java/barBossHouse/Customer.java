@@ -1,6 +1,8 @@
 package barBossHouse;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.util.Objects;
 
 public final class Customer {
     private final String firstName;
@@ -43,6 +45,8 @@ public final class Customer {
 
     public int getAge() {
         return LocalDate.now().getYear() - birthDate.getYear();
+        //todo Period p = Period.between(LocalDate.now(), birthDate);
+
     }
 
     public Address getAddress() {
@@ -51,6 +55,7 @@ public final class Customer {
 
     @Override
     public String toString() {
+        //todo Objects.toString(secondName, "")
         StringBuilder sb = new StringBuilder();
         sb.append("Customer: ");
         if (!secondName.isEmpty())
@@ -65,11 +70,14 @@ public final class Customer {
 
     @Override
     public boolean equals(Object obj) {
+
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
         Customer customer = (Customer) obj;
+        //todo Objects.equals(birthDate, customer.birthDate)
+
         return birthDate.equals(customer.birthDate) &&
                 firstName.equals(customer.firstName) &&
                 secondName.equals(customer.secondName) &&
@@ -78,6 +86,7 @@ public final class Customer {
 
     @Override
     public int hashCode() {
+       //todo Objects.hash(firstName, secondName ..);
         return firstName.hashCode() ^ secondName.hashCode() ^ birthDate.hashCode() ^ address.hashCode();
     }
 }

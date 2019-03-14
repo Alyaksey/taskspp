@@ -1,6 +1,7 @@
 package barBossHouse;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.function.BiPredicate;
 
 public class TableOrder implements Order {
@@ -65,11 +66,7 @@ public class TableOrder implements Order {
      */
     @Override
     public boolean add(MenuItem item) {
-        if (item instanceof Drink) {
-            Drink drink = (Drink) item;
-            if (drink.isAlcoholicDrink() && (customer.getAge() < 18 || LocalDateTime.now().getHour() > 22))
-                throw new UnlawfulActionException("You're not allowed to buy an alcohol");
-        }
+        checkLawless(item);
         if (size == items.length) {
             MenuItem[] newItems = new MenuItem[items.length * 2];
             System.arraycopy(items, 0, newItems, 0, items.length);
@@ -303,8 +300,10 @@ public class TableOrder implements Order {
     @Override
     public int hashCode() {
         int hashCode = customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode();
+        //todo Arrays.deepHashCode(items)
         for (int i = 0; i < size; i++) {
             hashCode ^= items[i].hashCode();
+
         }
         return hashCode;
     }
