@@ -1,6 +1,7 @@
 package barBossHouse;
 
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 public class InternetOrder implements Order {
@@ -15,9 +16,7 @@ public class InternetOrder implements Order {
         head = null;
         tail = null;
         this.customer = customer;
-        for (int i = 0; i < items.length; i++) {
-            add(items[i]);
-        }
+        this.addAll(Arrays.asList(items));
         dateTime = LocalDateTime.now();
     }
 
@@ -40,6 +39,68 @@ public class InternetOrder implements Order {
     }
 
     @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        for (MenuItem item : this) {
+            if (item.equals(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public Iterator<MenuItem> iterator() {
+        return new Iterator<MenuItem>() {
+            ListNode currentNode = head;
+            int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return currentNode.getNext() != null;
+            }
+
+            @Override
+            public MenuItem next() {
+                if (hasNext()) {
+                    MenuItem item = currentNode.getValue();
+                    currentNode = currentNode.getNext();
+                    index++;
+                    return item;
+                }
+                return currentNode.getValue();
+            }
+        };
+    }
+
+    @Override
+    public Object[] toArray() {
+        return getItems();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        T[] items = (T[]) toArray();
+        if (a.length < size)
+            return (T[]) Arrays.copyOf(items, size, a.getClass());
+        System.arraycopy(items, 0, a, 0, size);
+        if (a.length > size)
+            a[size] = null;
+        return a;
+    }
+
+    @Override
     public boolean add(MenuItem item) {
         checkLawless(item);
         ListNode node = new ListNode(item);
@@ -52,6 +113,57 @@ public class InternetOrder implements Order {
         }
         size++;
         return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return this.stream().filter(item -> item.equals(o)).findFirst().filter(this::remove).isPresent();
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return c.stream().allMatch(this::contains);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends MenuItem> c) {
+        c.forEach(this::add);
+        return true;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends MenuItem> c) {
+        checkIndex(index);
+        for (MenuItem item : c)
+            add(index++, item);
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
+        for (Object obj : c) {
+            if (remove(obj))
+                modified = true;
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
+        for (MenuItem item : this) {
+            if (!c.contains(item)) {
+                remove(item);
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public void clear() {
+        this.forEach(this::remove);
     }
 
     private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
@@ -175,10 +287,8 @@ public class InternetOrder implements Order {
 
     @Override
     public MenuItem[] sortedItemsByCostDesc() {
-        //todo можно вынести в интерфейс
-        MenuItem[] sortedItems = getItems();
-        mergeSort(sortedItems);
-        return sortedItems;
+        //todo можно вынести в интерфейс+
+        return Order.super.sortedItemsByCostDesc();
     }
 
     @Override
@@ -205,21 +315,8 @@ public class InternetOrder implements Order {
 
     @Override
     public boolean equals(Object obj) {
-        //todo можно вынести в интерфейс с проверкой типа Order
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        InternetOrder internetOrder = (InternetOrder) obj;
-        if (customer.equals(internetOrder.customer) && size == internetOrder.size && dateTime.equals(internetOrder.dateTime)) {
-            String[] itemsNames = itemsNames();
-            for (int i = 0; i < itemsNames.length; i++) {
-                if (itemQuantity(itemsNames[i]) != internetOrder.itemQuantity(itemsNames[i]))
-                    return false;
-            }
-            return true;
-        }
-        return false;
+        //todo можно вынести в интерфейс с проверкой типа Order+
+        return Order.super.isEqual(obj);
     }
 
     @Override
@@ -233,36 +330,175 @@ public class InternetOrder implements Order {
         return hashCode;
     }
 
-    private void mergeSort(MenuItem[] items) {
-        if (items.length < 2)
-            return;
-        int mid = items.length / 2;
-        MenuItem[] leftArray = new MenuItem[mid];
-        MenuItem[] rightArray = new MenuItem[items.length - mid];
-        System.arraycopy(items, 0, leftArray, 0, leftArray.length);
-        System.arraycopy(items, leftArray.length, rightArray, 0, rightArray.length);
-        mergeSort(leftArray);
-        mergeSort(rightArray);
-        merge(items, leftArray, rightArray);
+    @Override
+    public MenuItem get(int index) {
+        checkIndex(index);
+        int i = 0;
+        for (MenuItem item : this) {
+            if (i == index)
+                return item;
+            i++;
+        }
+        return null;
     }
 
-    private void merge(MenuItem[] items, MenuItem[] leftArray, MenuItem[] rightArray) {
+    @Override
+    public MenuItem set(int index, MenuItem element) {
+        checkIndex(index);
+        ListNode currentNode = head;
         int i = 0;
-        int j = 0;
-        int k = 0;
-        while (i < leftArray.length && j < rightArray.length) {
-            if (leftArray[i].getCost() >= rightArray[j].getCost()) {
-                items[k++] = leftArray[i++];
-            } else {
-                items[k++] = rightArray[j++];
+        while (currentNode != null) {
+            if (i == index) {
+                currentNode.setValue(element);
+                return currentNode.getValue();
+            }
+            i++;
+            currentNode = currentNode.getNext();
+        }
+        return null;
+    }
+
+    @Override
+    public void add(int index, MenuItem element) {
+        checkIndex(index);
+        ListNode currentNode = head;
+        ListNode previousNode = null;
+        ListNode newNode = new ListNode(element);
+        int i = 0;
+        while (currentNode != null) {
+            if (i == index) {
+                if (i == 0) {
+                    newNode.setNext(currentNode);
+                    head = newNode;
+                } else if (i == size - 1) {
+                    tail.setNext(newNode);
+                    tail = newNode;
+                } else {
+                    previousNode.setNext(newNode);
+                    newNode.setNext(currentNode);
+                }
+                size++;
+                return;
+            }
+            i++;
+            previousNode = currentNode;
+            currentNode = currentNode.getNext();
+        }
+    }
+
+    @Override
+    public MenuItem remove(int index) {
+        int i = 0;
+        for (MenuItem item : this) {
+            if (index == i) {
+                remove(item);
+                return item;
             }
         }
-        while (i < leftArray.length) {
-            items[k++] = leftArray[i++];
+        return null;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        int i = 0;
+        for (MenuItem item : this) {
+            if (item.equals(o)) {
+                return i;
+            }
+            i++;
         }
-        while (j < rightArray.length) {
-            items[k++] = rightArray[j++];
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        int i = 0;
+        int lastIndex = 0;
+        for (MenuItem item : this) {
+            if (item.equals(o))
+                lastIndex = i;
+            i++;
         }
+        return lastIndex;
+    }
+
+    @Override
+    public ListIterator<MenuItem> listIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public ListIterator<MenuItem> listIterator(int index) {
+        return new ListIterator<MenuItem>() {
+            int currentIndex = index;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            public MenuItem next() {
+                if (hasNext()) {
+                    return get(currentIndex++);
+                }
+                return get(currentIndex);
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return currentIndex > 0;
+            }
+
+            @Override
+            public MenuItem previous() {
+                if (hasPrevious())
+                    return get(currentIndex--);
+                return get(currentIndex);
+            }
+
+            @Override
+            public int nextIndex() {
+                if (hasNext())
+                    return currentIndex + 1;
+                return currentIndex;
+            }
+
+            @Override
+            public int previousIndex() {
+                if (hasPrevious())
+                    return currentIndex - 1;
+                return currentIndex;
+            }
+
+            @Override
+            public void remove() {
+                InternetOrder.this.remove(currentIndex);
+            }
+
+            @Override
+            public void set(MenuItem item) {
+                InternetOrder.this.set(currentIndex, item);
+            }
+
+            @Override
+            public void add(MenuItem item) {
+                InternetOrder.this.add(currentIndex, item);
+            }
+        };
+    }
+
+    @Override
+    public List<MenuItem> subList(int fromIndex, int toIndex) {
+        int i = 0;
+        List<MenuItem> items = new InternetOrder();
+        for (MenuItem item : this) {
+            if (i >= fromIndex && i <= toIndex) {
+                items.add(item);
+            }
+            i++;
+        }
+        return items;
     }
 
     private void removeNode(ListNode currentNode, ListNode previousNode) {
@@ -311,5 +547,11 @@ public class InternetOrder implements Order {
         public void setValue(MenuItem value) {
             this.value = value;
         }
+
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index > size)
+            throw new IndexOutOfBoundsException("Index is out of bounds");
     }
 }

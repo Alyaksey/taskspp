@@ -1,11 +1,13 @@
 package barBossHouse;
 
+import java.util.Objects;
+
 public final class Address {
     private final String cityName;
     private final int zipCode;
     private final String streetName;
     private final int buildingNumber;
-    private final char buildingLetter;
+    private final String buildingLetter;
     private final int apartmentNumber;
 
     public static final Address EMPTY_ADDRESS = new Address();
@@ -14,7 +16,7 @@ public final class Address {
     private static final int UNKNOWN_ZIP_CODE = -1;
     private static final String UNKNOWN_STREET_NAME = "";
     private static final int UNKNOWN_BUILDING_NUMBER = -1;
-    private static final char UNKNOWN_BUILDING_LETTER = ' ';
+    private static final String UNKNOWN_BUILDING_LETTER = "";
     private static final int UNKNOWN_APARTMENT_NUMBER = -1;
     private static final String DEFAULT_CITY = "Самара";
 
@@ -23,19 +25,23 @@ public final class Address {
         this(UNKNOWN_CITY_NAME, UNKNOWN_ZIP_CODE, UNKNOWN_STREET_NAME, UNKNOWN_BUILDING_NUMBER, UNKNOWN_BUILDING_LETTER, UNKNOWN_APARTMENT_NUMBER);
     }
 
-    public Address(String streetName, int buildingNumber, char buildingLetter, int apartmentNumber) {
+    public Address(String streetName, int buildingNumber, String buildingLetter, int apartmentNumber) {
         this(DEFAULT_CITY, UNKNOWN_ZIP_CODE, streetName, buildingNumber, buildingLetter, apartmentNumber);
     }
 
-    public Address(String cityName, int zipCode, String streetName, int buildingNumber, char buildingLetter, int apartmentNumber) {
-        if (zipCode < 0)
-            throw new IllegalArgumentException("Zip-code cannot be negative");
-        if (buildingNumber < 0)
-            throw new IllegalArgumentException("Building's number cannot be negative");
-        if (apartmentNumber < 0)
-            throw new IllegalArgumentException("Apartment's number cannot be negative");
-        if (!Character.isLetter(buildingLetter))
-            throw new IllegalArgumentException("Building letter must contain letter");
+    public Address(String cityName, int zipCode, String streetName, int buildingNumber, String buildingLetter, int apartmentNumber) {
+        if (zipCode < 0) {
+            //throw new IllegalArgumentException("Zip-code cannot be negative");
+        }
+        if (buildingNumber < 0) {
+            //throw new IllegalArgumentException("Building's number cannot be negative");
+        }
+        if (apartmentNumber < 0) {
+            //throw new IllegalArgumentException("Apartment's number cannot be negative");
+        }
+        if (buildingLetter.isEmpty()) {
+            //throw new IllegalArgumentException("Building letter must contain letter");
+        }
         this.cityName = cityName;
         this.zipCode = zipCode;
         this.streetName = streetName;
@@ -60,7 +66,7 @@ public final class Address {
         return buildingNumber;
     }
 
-    public char getBuildingLetter() {
+    public String getBuildingLetter() {
         return buildingLetter;
     }
 
@@ -70,8 +76,11 @@ public final class Address {
 
     @Override
     public String toString() {
-        return String.format("Address: %s %d, %s %d %c-%d", cityName, zipCode, streetName, buildingNumber,
-                buildingLetter,
+        return String.format("Address: %s %d, %s %d %s-%d", Objects.toString(cityName, ""),
+                zipCode,
+                Objects.toString(streetName, ""),
+                buildingNumber,
+                Objects.toString(buildingLetter, ""),
                 apartmentNumber);
     }
 
@@ -82,15 +91,13 @@ public final class Address {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Address address = (Address) obj;
-        return (address.cityName.equals(this.cityName) && address.zipCode == this.zipCode &&
-                address.streetName.equals(this.streetName) && address.buildingNumber == this.buildingNumber &&
-                address.buildingLetter == this.buildingLetter && address.apartmentNumber == this.apartmentNumber);
+        return (Objects.equals(address.cityName, this.cityName) && address.zipCode == this.zipCode &&
+                Objects.equals(address.streetName, this.streetName) && address.buildingNumber == this.buildingNumber &&
+                Objects.equals(address.buildingLetter, buildingLetter) && address.apartmentNumber == this.apartmentNumber);
     }
 
     @Override
     public int hashCode() {
-        return cityName.hashCode() ^ Integer.hashCode(zipCode) ^ streetName.hashCode() ^
-                Integer.hashCode(buildingNumber) ^ Character.hashCode(buildingLetter) ^
-                Integer.hashCode(apartmentNumber);
+        return Objects.hash(cityName, zipCode, streetName, buildingNumber, buildingLetter, apartmentNumber);
     }
 }

@@ -1,6 +1,8 @@
 package barBossHouse;
 
-public abstract class MenuItem {
+import java.util.Objects;
+
+public abstract class MenuItem implements Comparable<MenuItem> {
     private double cost;
     private String name;
     private String description;
@@ -50,7 +52,7 @@ public abstract class MenuItem {
 
     @Override
     public String toString() {
-        return String.format("%s, %.2fр.", name, cost);
+        return String.format("%s, %.2fр.", Objects.toString(name, ""), cost);
     }
 
     @Override
@@ -61,11 +63,17 @@ public abstract class MenuItem {
             return false;
         MenuItem menuItem = (MenuItem) obj;
         return menuItem.cost == cost &&
-                name.equals(menuItem.name);
+                Objects.equals(name, menuItem.name);
     }
 
     @Override
     public int hashCode() {
-        return Double.hashCode(cost) ^ name.hashCode();
+        return Objects.hash(name, cost);
     }
+
+    @Override
+    public int compareTo(MenuItem o) {
+        return Double.compare(cost, o.cost);
+    }
+
 }

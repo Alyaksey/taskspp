@@ -1,8 +1,10 @@
 package barBossHouse;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.*;
+import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.stream.IntStream;
 
 public class TableOrder implements Order {
     private Customer customer;
@@ -60,6 +62,56 @@ public class TableOrder implements Order {
         this.dateTime = dateTime;
     }
 
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return Arrays.stream(items).anyMatch(item -> item.equals(o));
+    }
+
+    @Override
+    public Iterator<MenuItem> iterator() {
+        return new Iterator<MenuItem>() {
+            int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            public MenuItem next() {
+                if (hasNext())
+                    return items[currentIndex++];
+                return items[currentIndex];
+            }
+        };
+    }
+
+    @Override
+    public Object[] toArray() {
+        return Arrays.copyOf(items, size, Object[].class);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        if (a.length < size)
+            return (T[]) Arrays.copyOf(items, size, a.getClass());
+        System.arraycopy(items, 0, a, 0, size);
+        if (a.length > size)
+            a[size] = null;
+        return a;
+    }
+
     /**
      * Метод, добавляющий блюдо в заказ (принимает ссылку на экземпляр класса MenuItem). Пока этот метод
      * возвращает истину после выполнения операции добавления элемента.
@@ -68,12 +120,71 @@ public class TableOrder implements Order {
     public boolean add(MenuItem item) {
         checkLawless(item);
         if (size == items.length) {
-            MenuItem[] newItems = new MenuItem[items.length * 2];
-            System.arraycopy(items, 0, newItems, 0, items.length);
-            items = newItems;
+            increaseCapacity();
         }
         items[size++] = item;
         return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return remove(areObjectsEqual, o);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return c.stream().allMatch(this::contains);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends MenuItem> c) {
+        c.forEach(this::add);
+        return true;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends MenuItem> c) {
+        checkIndex(index);
+        if (c.size() + size() > items.length) {
+            increaseCapacity();
+        }
+        System.arraycopy(items, index, items, index + c.size(), c.size());
+        for (MenuItem item : c)
+            items[index++] = item;
+        return true;
+    }
+
+    private void increaseCapacity() {
+        MenuItem[] newItems = new MenuItem[items.length * 2];
+        System.arraycopy(items, 0, newItems, 0, items.length);
+        items = newItems;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
+        for (Object item : c)
+            if (remove(item))
+                modified = true;
+        return modified;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
+        for (int i = 0; i < size; i++) {
+            if (!c.contains(items[i])) {
+                remove(items[i]);
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public void clear() {
+        IntStream.range(0, size).forEach(i -> items[i] = null);
+        size = 0;
     }
 
     /**
@@ -83,6 +194,7 @@ public class TableOrder implements Order {
      */
     private BiPredicate<String, Integer> areNamesEqual = (name, i) -> name.equals(items[i].getName());
     private BiPredicate<MenuItem, Integer> areItemsEqual = (item, i) -> item.equals(items[i]);
+    private BiPredicate<Object, Integer> areObjectsEqual = (obj, i) -> obj.equals(items[i]);
 
     @Override
     public boolean remove(String itemName) {
@@ -181,7 +293,7 @@ public class TableOrder implements Order {
     private <T> int itemQuantity(BiPredicate<T, Integer> biPredicate, T object) {
         int itemQuantity = 0;
         for (int i = 0; i < size; i++) {
-            if (biPredicate.test(object, i)) ;
+            biPredicate.test(object, i);
             itemQuantity++;
         }
         return itemQuantity;
@@ -209,9 +321,7 @@ public class TableOrder implements Order {
      */
     @Override
     public MenuItem[] sortedItemsByCostDesc() {
-        MenuItem[] sortedItems = getItems();
-        mergeSort(sortedItems);
-        return sortedItems;
+        return Order.super.sortedItemsByCostDesc();
     }
 
     @Override
@@ -230,82 +340,158 @@ public class TableOrder implements Order {
     }
 
     private boolean containsDuplicates(String[] names, int count) {
-        for (int i = 0; i < count; i++) {
-            if (names[i].equals(names[count]))
-                return true;
-        }
-        return false;
-    }
-
-    private void mergeSort(MenuItem[] items) {
-        if (items.length < 2)
-            return;
-        int mid = items.length / 2;
-        MenuItem[] leftArray = new MenuItem[mid];
-        MenuItem[] rightArray = new MenuItem[items.length - mid];
-        System.arraycopy(items, 0, leftArray, 0, leftArray.length);
-        System.arraycopy(items, leftArray.length, rightArray, 0, rightArray.length);
-        mergeSort(leftArray);
-        mergeSort(rightArray);
-        merge(items, leftArray, rightArray);
-    }
-
-    private void merge(MenuItem[] items, MenuItem[] leftArray, MenuItem[] rightArray) {
-        int i = 0;
-        int j = 0;
-        int k = 0;
-        while (i < leftArray.length && j < rightArray.length) {
-            if (leftArray[i].getCost() >= rightArray[j].getCost()) {
-                items[k++] = leftArray[i++];
-            } else {
-                items[k++] = rightArray[j++];
-            }
-        }
-        while (i < leftArray.length) {
-            items[k++] = leftArray[i++];
-        }
-        while (j < rightArray.length) {
-            items[k++] = rightArray[j++];
-        }
+        return IntStream.range(0, count).anyMatch(i -> names[i].equals(names[count]));
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("TableOrder: ").append(size).append("\n");
-        for (int i = 0; i < size; i++) {
-            sb.append(items[i].toString()).append("\n");
-        }
+        IntStream.range(0, size).forEach(i -> sb.append(items[i].toString()).append("\n"));
         return sb.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        TableOrder tableOrder = (TableOrder) obj;
-        if (customer.equals(tableOrder.customer) && size == tableOrder.size && dateTime.equals(tableOrder.dateTime)) {
-            String[] itemsNames = itemsNames();
-            for (int i = 0; i < itemsNames.length; i++) {
-                if (itemQuantity(itemsNames[i]) != tableOrder.itemQuantity(itemsNames[i]))
-                    return false;
-            }
-            return true;
-        }
-        return false;
+        return Order.super.isEqual(obj);
     }
 
     @Override
     public int hashCode() {
-        int hashCode = customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode();
-        //todo Arrays.deepHashCode(items)
-        for (int i = 0; i < size; i++) {
-            hashCode ^= items[i].hashCode();
-
-        }
-        return hashCode;
+        return customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode() ^ Arrays.deepHashCode(items);
+        //todo Arrays.deepHashCode(items)+
     }
 
+    @Override
+    public MenuItem get(int index) {
+        checkIndex(index);
+        return items[index];
+    }
+
+    @Override
+    public MenuItem set(int index, MenuItem element) {
+        checkIndex(index);
+        MenuItem oldItem = get(index);
+        items[index] = element;
+        return oldItem;
+    }
+
+    @Override
+    public void add(int index, MenuItem element) {
+        checkIndex(index);
+        if (size == items.length)
+            increaseCapacity();
+        System.arraycopy(items, index, items, index + 1, size - index);
+        items[index] = element;
+        size++;
+    }
+
+    @Override
+    public MenuItem remove(int index) {
+        checkIndex(index);
+        MenuItem removedItem = items[index];
+        shiftArray(index);
+        size--;
+        return removedItem;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return IntStream.range(0, size).filter(i -> items[i].equals(o)).findFirst().orElse(-1);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        for (int i = size - 1; i >= 0; i--) {
+            if (items[i].equals(o))
+                return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public ListIterator<MenuItem> listIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public ListIterator<MenuItem> listIterator(int index) {
+        return new ListIterator<MenuItem>() {
+            int currentIndex = index;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            public MenuItem next() {
+                if (hasNext())
+                    return items[currentIndex++];
+                return items[currentIndex];
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return currentIndex > 0;
+            }
+
+            @Override
+            public MenuItem previous() {
+                if (hasPrevious()) {
+                    return items[currentIndex--];
+                }
+                return items[currentIndex];
+            }
+
+            @Override
+            public int nextIndex() {
+                if (hasNext())
+                    return currentIndex + 1;
+                return currentIndex;
+            }
+
+            @Override
+            public int previousIndex() {
+                if (hasPrevious())
+                    return currentIndex - 1;
+                return currentIndex;
+            }
+
+            @Override
+            public void remove() {
+                shiftArray(currentIndex);
+            }
+
+            @Override
+            public void set(MenuItem item) {
+                items[currentIndex] = item;
+            }
+
+            @Override
+            public void add(MenuItem item) {
+                TableOrder.this.add(currentIndex, item);
+            }
+        };
+    }
+
+    @Override
+    public List<MenuItem> subList(int fromIndex, int toIndex) {
+        checkBounds(fromIndex, toIndex);
+        return Arrays.asList(items).subList(fromIndex, toIndex);
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index > size)
+            throw new IndexOutOfBoundsException("Index is out of bounds");
+    }
+
+    private void checkBounds(int fromIndex, int toIndex) {
+        if (fromIndex > toIndex)
+            throw new IllegalArgumentException("Wrong arguments");
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException("Index is out of bounds;");
+        if (toIndex > size)
+            throw new IndexOutOfBoundsException("Index is out of bounds");
+    }
 }

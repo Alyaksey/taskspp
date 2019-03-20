@@ -15,8 +15,8 @@ public final class Customer {
     private static final int NOT_MATURE_CUSTOMER_AGE = 14;
     private static final int MATURE_CUSTOMER_AGE = 18;
 
-    public static final Customer NOT_MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - NOT_MATURE_CUSTOMER_AGE,1,1));
-    public static final Customer MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - MATURE_CUSTOMER_AGE,1,1));
+    public static final Customer NOT_MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - NOT_MATURE_CUSTOMER_AGE, 1, 1));
+    public static final Customer MATURE_UNKNOWN_CUSTOMER = new Customer(LocalDate.of(LocalDate.now().getYear() - MATURE_CUSTOMER_AGE, 1, 1));
 
     public Customer() {
         this(UNKNOWN_FIRST_NAME, UNKNOWN_SECOND_NAME, LocalDate.now(), Address.EMPTY_ADDRESS);
@@ -44,8 +44,8 @@ public final class Customer {
     }
 
     public int getAge() {
-        return LocalDate.now().getYear() - birthDate.getYear();
-        //todo Period p = Period.between(LocalDate.now(), birthDate);
+        return Period.between(LocalDate.now(), birthDate).getYears();
+        //todo Period p = Period.between(LocalDate.now(), birthDate);+
 
     }
 
@@ -55,38 +55,34 @@ public final class Customer {
 
     @Override
     public String toString() {
-        //todo Objects.toString(secondName, "")
-        StringBuilder sb = new StringBuilder();
-        sb.append("Customer: ");
-        if (!secondName.isEmpty())
-            sb.append(secondName);
-        if (!firstName.isEmpty())
-            sb.append(" ").append(firstName);
-            sb.append(", ").append(birthDate);
-        if (!address.equals(Address.EMPTY_ADDRESS))
-            sb.append(", ").append(address.toString());
+        //todo Objects.toString(secondName, "")+
+        StringBuilder sb = new StringBuilder("Customer: ");
+        sb.append(Objects.toString(secondName, ""))
+                .append(" ")
+                .append(Objects.toString(firstName, ""))
+                .append(", ")
+                .append(Objects.toString(birthDate, ""))
+                .append(", ").append(Objects.toString(address, ""));
         return sb.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
         Customer customer = (Customer) obj;
-        //todo Objects.equals(birthDate, customer.birthDate)
-
-        return birthDate.equals(customer.birthDate) &&
-                firstName.equals(customer.firstName) &&
-                secondName.equals(customer.secondName) &&
-                address.equals(customer.address);
+        //todo Objects.equals(birthDate, customer.birthDate);+
+        return Objects.equals(birthDate, customer.birthDate) &&
+                Objects.equals(firstName, customer.firstName) &&
+                Objects.equals(secondName, customer.secondName) &&
+                Objects.equals(address, customer.address);
     }
 
     @Override
     public int hashCode() {
-       //todo Objects.hash(firstName, secondName ..);
-        return firstName.hashCode() ^ secondName.hashCode() ^ birthDate.hashCode() ^ address.hashCode();
+        //todo Objects.hash(firstName, secondName ..);+
+        return Objects.hash(firstName, secondName, birthDate, address);
     }
 }

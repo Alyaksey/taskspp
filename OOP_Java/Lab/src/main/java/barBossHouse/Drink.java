@@ -49,7 +49,6 @@ public final class Drink extends MenuItem implements Alcoholable {
 
     @Override
     public boolean equals(Object obj) {
-
         if (!super.equals(obj))
             return false;
         Drink drink = (Drink) obj;
