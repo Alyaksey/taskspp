@@ -43,8 +43,23 @@ public interface Order extends List<MenuItem> {
     @Override
     int hashCode();
 
-    @Override
-    boolean equals(Object obj);
+    default boolean isEquals(Object obj){
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        TableOrder tableOrder = (TableOrder) obj;
+        if (this.getCustomer().equals(tableOrder.getCustomer()) && this.itemsQuantity() == tableOrder.itemsQuantity()
+                && this.getDateTime().equals(tableOrder.getDateTime())) {
+            String[] itemsNames = itemsNames();
+            for (int i = 0; i < itemsNames.length; i++) {
+                if (itemQuantity(itemsNames[i]) != tableOrder.itemQuantity(itemsNames[i]))
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
 
     default void checkLawless(MenuItem item) {
         if (item instanceof Drink) {

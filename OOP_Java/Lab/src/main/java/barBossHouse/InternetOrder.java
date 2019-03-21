@@ -67,7 +67,7 @@ public class InternetOrder implements Order {
 
             @Override
             public boolean hasNext() {
-                return currentNode.getNext() != null;
+                return index < size;
             }
 
             @Override
@@ -490,6 +490,7 @@ public class InternetOrder implements Order {
 
     @Override
     public List<MenuItem> subList(int fromIndex, int toIndex) {
+        checkBounds(fromIndex, toIndex);
         int i = 0;
         List<MenuItem> items = new InternetOrder();
         for (MenuItem item : this) {
@@ -552,6 +553,15 @@ public class InternetOrder implements Order {
 
     private void checkIndex(int index) {
         if (index < 0 || index > size)
+            throw new IndexOutOfBoundsException("Index is out of bounds");
+    }
+
+    private void checkBounds(int fromIndex, int toIndex) {
+        if (fromIndex > toIndex)
+            throw new IllegalArgumentException("Wrong arguments");
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException("Index is out of bounds;");
+        if (toIndex > size)
             throw new IndexOutOfBoundsException("Index is out of bounds");
     }
 }
