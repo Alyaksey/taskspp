@@ -45,8 +45,6 @@ public final class Customer {
 
     public int getAge() {
         return Period.between(LocalDate.now(), birthDate).getYears();
-        //todo Period p = Period.between(LocalDate.now(), birthDate);+
-
     }
 
     public Address getAddress() {
@@ -55,7 +53,6 @@ public final class Customer {
 
     @Override
     public String toString() {
-        //todo Objects.toString(secondName, "")+
         StringBuilder sb = new StringBuilder("Customer: ");
         sb.append(Objects.toString(secondName, ""))
                 .append(" ")
@@ -73,7 +70,6 @@ public final class Customer {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Customer customer = (Customer) obj;
-        //todo Objects.equals(birthDate, customer.birthDate);+
         return Objects.equals(birthDate, customer.birthDate) &&
                 Objects.equals(firstName, customer.firstName) &&
                 Objects.equals(secondName, customer.secondName) &&
@@ -82,7 +78,6 @@ public final class Customer {
 
     @Override
     public int hashCode() {
-        //todo Objects.hash(firstName, secondName ..);+
         return Objects.hash(firstName, secondName, birthDate, address);
     }
 }

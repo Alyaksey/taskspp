@@ -89,6 +89,7 @@ public class TableOrder implements Order {
 
             @Override
             public MenuItem next() {
+                //todo NoSuchElementException
                 if (hasNext())
                     return items[currentIndex++];
                 return items[currentIndex];
@@ -98,7 +99,7 @@ public class TableOrder implements Order {
 
     @Override
     public Object[] toArray() {
-        return Arrays.copyOf(items, size, Object[].class);
+        return Arrays.copyOf(items, size, MenuItem[].class);
     }
 
     @Override
@@ -124,11 +125,6 @@ public class TableOrder implements Order {
         }
         items[size++] = item;
         return true;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return remove(areObjectsEqual, o);
     }
 
     @Override
@@ -160,17 +156,10 @@ public class TableOrder implements Order {
         items = newItems;
     }
 
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        boolean modified = false;
-        for (Object item : c)
-            if (remove(item))
-                modified = true;
-        return modified;
-    }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        //todo аналогично RemoveAll(collection)
         boolean modified = false;
         for (int i = 0; i < size; i++) {
             if (!c.contains(items[i])) {
@@ -192,8 +181,8 @@ public class TableOrder implements Order {
      * параметра). Если блюд с заданным названием несколько, удаляется первое найденное. Возвращает
      * логическое значение (true, если элемент был удален).
      */
-    private BiPredicate<String, Integer> areNamesEqual = (name, i) -> name.equals(items[i].getName());
-    private BiPredicate<MenuItem, Integer> areItemsEqual = (item, i) -> item.equals(items[i]);
+    private BiPredicate<String, MenuItem> areNamesEqual = (name, menuItem) -> name.equals(menuItem.getName());
+    private BiPredicate<Object, MenuItem> areItemsEqual = Object::equals;
     private BiPredicate<Object, Integer> areObjectsEqual = (obj, i) -> obj.equals(items[i]);
 
     @Override
@@ -202,13 +191,13 @@ public class TableOrder implements Order {
     }
 
     @Override
-    public boolean remove(MenuItem item) {
-        return remove(areItemsEqual, item);
+    public boolean remove(Object object) {
+        return remove(areItemsEqual, object);
     }
 
-    private <T> boolean remove(BiPredicate<T, Integer> biPredicate, T object) {
+    private <T> boolean remove(BiPredicate<T, MenuItem> biPredicate, T object) {
         for (int i = 0; i < size; i++) {
-            if (biPredicate.test(object, i)) {
+            if (biPredicate.test(object, items[i])) {
                 shiftArray(i);
                 size--;
                 return true;
@@ -231,11 +220,20 @@ public class TableOrder implements Order {
         return removeAll(areItemsEqual, item);
     }
 
-    private <T> int removeAll(BiPredicate<T, Integer> biPredicate, T object) {
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        int removedElementsCount = removeAll(ContainsInCollection, c);
+        return removedElementsCount > 0;
+    }
+
+    private BiPredicate<Collection<?> , MenuItem> ContainsInCollection = Collection::contains;
+
+
+    private <T> int removeAll(BiPredicate<T, MenuItem> biPredicate, T object) {
         int removedItemsCount = 0;
         MenuItem[] newItems = new MenuItem[items.length];
         for (int i = 0; i < size; i++) {
-            if (biPredicate.test(object, i)) {
+            if (biPredicate.test(object, items[i])) {
                 items[i] = null;
                 removedItemsCount++;
             }
@@ -245,24 +243,6 @@ public class TableOrder implements Order {
         items = newItems;
         size -= removedItemsCount;
         return removedItemsCount;
-    }
-
-    /**
-     * Метод, возвращающий общее число блюд (повторяющиеся блюда тоже считаются) в заказе.
-     */
-    @Override
-    public int itemsQuantity() {
-        return size;
-    }
-
-    /**
-     * Метод, возвращающий массив блюд (значений null в массиве быть не должно).
-     */
-    @Override
-    public MenuItem[] getItems() {
-        MenuItem[] newItems = new MenuItem[size];
-        System.arraycopy(items, 0, newItems, 0, size);
-        return newItems;
     }
 
     /**
@@ -290,10 +270,10 @@ public class TableOrder implements Order {
         return itemQuantity(areItemsEqual, item);
     }
 
-    private <T> int itemQuantity(BiPredicate<T, Integer> biPredicate, T object) {
+    private <T> int itemQuantity(BiPredicate<T, MenuItem> biPredicate, T object) {
         int itemQuantity = 0;
         for (int i = 0; i < size; i++) {
-            biPredicate.test(object, i);
+            biPredicate.test(object, items[i]);
             itemQuantity++;
         }
         return itemQuantity;
@@ -314,14 +294,6 @@ public class TableOrder implements Order {
         String[] uniqueNames = new String[uniqueNamesCount];
         System.arraycopy(names, 0, uniqueNames, 0, uniqueNamesCount);
         return uniqueNames;
-    }
-
-    /**
-     * Метод, возвращающий массив блюд, отсортированный по убыванию цены.
-     */
-    @Override
-    public MenuItem[] sortedItemsByCostDesc() {
-        return Order.super.sortedItemsByCostDesc();
     }
 
     @Override
@@ -359,7 +331,6 @@ public class TableOrder implements Order {
     @Override
     public int hashCode() {
         return customer.hashCode() ^ Integer.hashCode(size) ^ dateTime.hashCode() ^ Arrays.deepHashCode(items);
-        //todo Arrays.deepHashCode(items)+
     }
 
     @Override
@@ -416,6 +387,7 @@ public class TableOrder implements Order {
 
     @Override
     public ListIterator<MenuItem> listIterator(int index) {
+        //todo учти особенности remove add set - см. документацию
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
 
@@ -478,6 +450,7 @@ public class TableOrder implements Order {
     @Override
     public List<MenuItem> subList(int fromIndex, int toIndex) {
         checkBounds(fromIndex, toIndex);
+        //todo возвращаеть нужно экземпляр TableOrder
         return Arrays.asList(items).subList(fromIndex, toIndex);
     }
 

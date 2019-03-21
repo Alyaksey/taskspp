@@ -83,6 +83,7 @@ public class InternetOrder implements Order {
         };
     }
 
+    //todo
     @Override
     public Object[] toArray() {
         return getItems();
@@ -113,11 +114,6 @@ public class InternetOrder implements Order {
         }
         size++;
         return true;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return this.stream().filter(item -> item.equals(o)).findFirst().filter(this::remove).isPresent();
     }
 
     @Override
@@ -167,7 +163,7 @@ public class InternetOrder implements Order {
     }
 
     private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
-    private BiPredicate<MenuItem, MenuItem> areItemsEqual = MenuItem::equals;
+    private BiPredicate<Object, MenuItem> areItemsEqual = Object::equals;
 
     @Override
     public boolean remove(String itemName) {
@@ -175,8 +171,8 @@ public class InternetOrder implements Order {
     }
 
     @Override
-    public boolean remove(MenuItem item) {
-        return remove(areItemsEqual, item);
+    public boolean remove(Object obj) {
+        return remove(areItemsEqual, obj);
     }
 
     private <T> boolean remove(BiPredicate<T, MenuItem> biPredicate, T object) {
@@ -221,12 +217,8 @@ public class InternetOrder implements Order {
     }
 
     @Override
-    public int itemsQuantity() {
-        return size;
-    }
-
-    @Override
     public MenuItem[] getItems() {
+        //todo toArray
         MenuItem[] items = new MenuItem[size];
         ListNode currentNode = head;
         for (int i = 0; i < size; i++) {
@@ -286,12 +278,6 @@ public class InternetOrder implements Order {
     }
 
     @Override
-    public MenuItem[] sortedItemsByCostDesc() {
-        //todo можно вынести в интерфейс+
-        return Order.super.sortedItemsByCostDesc();
-    }
-
-    @Override
     public Customer getCustomer() {
         return customer;
     }
@@ -315,8 +301,7 @@ public class InternetOrder implements Order {
 
     @Override
     public boolean equals(Object obj) {
-        //todo можно вынести в интерфейс с проверкой типа Order+
-        return Order.super.isEqual(obj);
+        return isEqual(obj);
     }
 
     @Override
@@ -350,7 +335,7 @@ public class InternetOrder implements Order {
         while (currentNode != null) {
             if (i == index) {
                 currentNode.setValue(element);
-                return currentNode.getValue();
+                return currentNode.getValue(); //todo возвращаешь замененный Item
             }
             i++;
             currentNode = currentNode.getNext();
@@ -400,7 +385,7 @@ public class InternetOrder implements Order {
 
     @Override
     public int indexOf(Object o) {
-        int i = 0;
+        int i = 0; //todo имя
         for (MenuItem item : this) {
             if (item.equals(o)) {
                 return i;
@@ -412,7 +397,7 @@ public class InternetOrder implements Order {
 
     @Override
     public int lastIndexOf(Object o) {
-        int i = 0;
+        int i = 0; //todo имя
         int lastIndex = 0;
         for (MenuItem item : this) {
             if (item.equals(o))
@@ -431,6 +416,8 @@ public class InternetOrder implements Order {
     public ListIterator<MenuItem> listIterator(int index) {
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
+            //todo текущий элемент
+            ListNode currentNode = getNode(index); // todo добавь приватный метод ибо дохера дублирования
 
             @Override
             public boolean hasNext() {
@@ -447,11 +434,14 @@ public class InternetOrder implements Order {
 
             @Override
             public boolean hasPrevious() {
+                //todo exception
+
                 return currentIndex > 0;
             }
 
             @Override
             public MenuItem previous() {
+                //todo exception
                 if (hasPrevious())
                     return get(currentIndex--);
                 return get(currentIndex);
@@ -466,6 +456,7 @@ public class InternetOrder implements Order {
 
             @Override
             public int previousIndex() {
+                //todo exception
                 if (hasPrevious())
                     return currentIndex - 1;
                 return currentIndex;

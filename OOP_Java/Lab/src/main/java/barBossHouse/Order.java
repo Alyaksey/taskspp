@@ -10,26 +10,17 @@ public interface Order extends List<MenuItem> {
 
     void setDateTime(LocalDateTime dateTime);
 
-    boolean add(MenuItem item);
-
     String[] itemsNames();
-
-    int itemsQuantity();
 
     int itemQuantity(MenuItem itemName);
 
     int itemQuantity(String itemName);
 
-    MenuItem[] getItems();
-
     boolean remove(String itemName);
-
-    boolean remove(MenuItem item);
 
     int removeAll(String itemName);
 
     int removeAll(MenuItem item);
-
 
     double costTotal();
 
@@ -49,7 +40,7 @@ public interface Order extends List<MenuItem> {
         if (obj == null || getClass() != obj.getClass())
             return false;
         TableOrder tableOrder = (TableOrder) obj;
-        if (this.getCustomer().equals(tableOrder.getCustomer()) && this.itemsQuantity() == tableOrder.itemsQuantity()
+        if (this.getCustomer().equals(tableOrder.getCustomer()) && this.size() == tableOrder.itemsQuantity()
                 && this.getDateTime().equals(tableOrder.getDateTime())) {
             String[] itemsNames = itemsNames();
             for (int i = 0; i < itemsNames.length; i++) {
@@ -61,16 +52,18 @@ public interface Order extends List<MenuItem> {
         return false;
     }
 
+    //todo логичнее в классе оставить
     default void checkLawless(MenuItem item) {
         if (item instanceof Drink) {
             Drink drink = (Drink) item;
             if (drink.isAlcoholicDrink() && (getCustomer().getAge() < 18 || LocalDateTime.now().getHour() > 22))
                 throw new UnlawfulActionException("You're not allowed to buy an alcohol");
+            //todo это 2 разные ситуации - 2 исключения со своими сообщениями генерируй
         }
     }
 
     default MenuItem[] sortedItemsByCostDesc() {
-        MenuItem[] sortedItems = getItems();
+        MenuItem[] sortedItems = (MenuItem[]) toArray();
         Arrays.sort(sortedItems);
         return sortedItems;
     }
