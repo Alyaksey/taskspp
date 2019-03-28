@@ -83,10 +83,18 @@ public class InternetOrder implements Order {
         };
     }
 
-    //todo
+    //todo+
     @Override
     public Object[] toArray() {
-        return getItems();
+        //todo toArray+
+        MenuItem[] items = new MenuItem[size];
+        ListNode currentNode = head;
+        for (int i = 0; i < size; i++) {
+            if (currentNode.getValue() != null)
+                items[i] = currentNode.getValue();
+            currentNode = currentNode.getNext();
+        }
+        return items;
     }
 
     @Override
@@ -137,24 +145,14 @@ public class InternetOrder implements Order {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        boolean modified = false;
-        for (Object obj : c) {
-            if (remove(obj))
-                modified = true;
-        }
-        return modified;
+        int removedItemsCount = removeAll(containsInCollection, c);
+        return removedItemsCount > 0;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        boolean modified = false;
-        for (MenuItem item : this) {
-            if (!c.contains(item)) {
-                remove(item);
-                modified = true;
-            }
-        }
-        return modified;
+        int removedItemsCount = removeAll(notContainsInCollection, c);
+        return removedItemsCount > 0;
     }
 
     @Override
@@ -164,8 +162,11 @@ public class InternetOrder implements Order {
 
     private BiPredicate<String, MenuItem> areNamesEqual = (name, item) -> name.equals(item.getName());
     private BiPredicate<Object, MenuItem> areItemsEqual = Object::equals;
+    private BiPredicate<Collection<?>, MenuItem> containsInCollection = Collection::contains;
+    private BiPredicate<Collection<?>, MenuItem> notContainsInCollection = (c, item) -> !c.contains(item);
 
     @Override
+
     public boolean remove(String itemName) {
         return remove(areNamesEqual, itemName);
     }
@@ -214,19 +215,6 @@ public class InternetOrder implements Order {
             currentNode = currentNode.getNext();
         }
         return removedItemsCount;
-    }
-
-    @Override
-    public MenuItem[] getItems() {
-        //todo toArray
-        MenuItem[] items = new MenuItem[size];
-        ListNode currentNode = head;
-        for (int i = 0; i < size; i++) {
-            if (currentNode.getValue() != null)
-                items[i] = currentNode.getValue();
-            currentNode = currentNode.getNext();
-        }
-        return items;
     }
 
     @Override
@@ -317,92 +305,65 @@ public class InternetOrder implements Order {
 
     @Override
     public MenuItem get(int index) {
-        checkIndex(index);
-        int i = 0;
-        for (MenuItem item : this) {
-            if (i == index)
-                return item;
-            i++;
-        }
-        return null;
+        return node(index).getValue();
     }
 
     @Override
     public MenuItem set(int index, MenuItem element) {
         checkIndex(index);
-        ListNode currentNode = head;
-        int i = 0;
-        while (currentNode != null) {
-            if (i == index) {
-                currentNode.setValue(element);
-                return currentNode.getValue(); //todo возвращаешь замененный Item
-            }
-            i++;
-            currentNode = currentNode.getNext();
-        }
-        return null;
+        ListNode node = node(index);
+        MenuItem replacedItem = node.getValue();
+        node.setValue(element);
+        return replacedItem; //todo возвращаешь замененный Item+
     }
 
     @Override
     public void add(int index, MenuItem element) {
         checkIndex(index);
-        ListNode currentNode = head;
-        ListNode previousNode = null;
+        ListNode previousNode = node(index - 1);
+        ListNode currentNode = previousNode.getNext();
         ListNode newNode = new ListNode(element);
-        int i = 0;
-        while (currentNode != null) {
-            if (i == index) {
-                if (i == 0) {
-                    newNode.setNext(currentNode);
-                    head = newNode;
-                } else if (i == size - 1) {
-                    tail.setNext(newNode);
-                    tail = newNode;
-                } else {
-                    previousNode.setNext(newNode);
-                    newNode.setNext(currentNode);
-                }
-                size++;
-                return;
-            }
-            i++;
-            previousNode = currentNode;
-            currentNode = currentNode.getNext();
+        if (currentNode == head) {
+            newNode.setNext(currentNode);
+            head = newNode;
+        } else if (currentNode == tail) {
+            tail.setNext(newNode);
+            tail = newNode;
+        } else {
+            previousNode.setNext(newNode);
+            newNode.setNext(currentNode);
         }
+        size++;
     }
 
     @Override
     public MenuItem remove(int index) {
-        int i = 0;
-        for (MenuItem item : this) {
-            if (index == i) {
-                remove(item);
-                return item;
-            }
-        }
-        return null;
+        ListNode node = node(index);
+        MenuItem item = node.getValue();
+        remove(item);
+        return node.getValue();
     }
 
     @Override
     public int indexOf(Object o) {
-        int i = 0; //todo имя
+        int indexOfObject = 0; //todo имя+
         for (MenuItem item : this) {
             if (item.equals(o)) {
-                return i;
+                return indexOfObject;
             }
-            i++;
+            indexOfObject++;
         }
         return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        int i = 0; //todo имя
+        int lastIndexOfObject = 0; //todo имя+
         int lastIndex = 0;
         for (MenuItem item : this) {
             if (item.equals(o))
-                lastIndex = i;
-            i++;
+                lastIndex = lastIndexOfObject;
+            lastIndexOfObject++;
         }
         return lastIndex;
     }
@@ -414,10 +375,13 @@ public class InternetOrder implements Order {
 
     @Override
     public ListIterator<MenuItem> listIterator(int index) {
+        checkIndex(index);
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
-            //todo текущий элемент
-            ListNode currentNode = getNode(index); // todo добавь приватный метод ибо дохера дублирования
+            ListNode lastReturned = null;
+            ListNode previousNode = node(index - 1); // todo добавь приватный метод ибо дохера дублирования+
+            //todo текущий элемент+
+            ListNode currentNode = previousNode.getNext();
 
             @Override
             public boolean hasNext() {
@@ -427,53 +391,58 @@ public class InternetOrder implements Order {
             @Override
             public MenuItem next() {
                 if (hasNext()) {
-                    return get(currentIndex++);
+                    lastReturned = currentNode;
+                    currentNode = currentNode.getNext();
+                    currentIndex++;
+                    return lastReturned.getValue();
                 }
-                return get(currentIndex);
+                throw new NoSuchElementException("No such element");
             }
 
             @Override
             public boolean hasPrevious() {
-                //todo exception
-
-                return currentIndex > 0;
+                //todo exception+
+                throw new UnsupportedOperationException("This operation is not supported");
             }
 
             @Override
             public MenuItem previous() {
-                //todo exception
-                if (hasPrevious())
-                    return get(currentIndex--);
-                return get(currentIndex);
+                //todo exception+
+                throw new UnsupportedOperationException("This operation is not supported");
             }
 
             @Override
             public int nextIndex() {
                 if (hasNext())
                     return currentIndex + 1;
-                return currentIndex;
+                throw new NoSuchElementException("No such index");
             }
 
             @Override
             public int previousIndex() {
-                //todo exception
-                if (hasPrevious())
-                    return currentIndex - 1;
-                return currentIndex;
+                //todo exception+
+                throw new UnsupportedOperationException("This operation is not supported");
             }
 
             @Override
             public void remove() {
-                InternetOrder.this.remove(currentIndex);
+                if (lastReturned == null) {
+                    throw new IllegalStateException("You can't remove item");
+                }
+                lastReturned = null;
+                removeNode(currentNode, previousNode);
             }
 
             @Override
             public void set(MenuItem item) {
-                InternetOrder.this.set(currentIndex, item);
+                if (lastReturned == null)
+                    throw new IllegalStateException("You can't set the value for item");
+                currentNode.setValue(item);
             }
 
             @Override
             public void add(MenuItem item) {
+                lastReturned = null;
                 InternetOrder.this.add(currentIndex, item);
             }
         };
@@ -554,5 +523,33 @@ public class InternetOrder implements Order {
             throw new IndexOutOfBoundsException("Index is out of bounds;");
         if (toIndex > size)
             throw new IndexOutOfBoundsException("Index is out of bounds");
+    }
+
+    //todo логичнее в классе оставить+
+    private void checkLawless(MenuItem item) {
+        if (item instanceof Drink) {
+            Drink drink = (Drink) item;
+            if (drink.isAlcoholicDrink()) {
+                if (customer.getAge() < 18)
+                    throw new UnlawfulActionException("You're too young");
+                if (LocalDateTime.now().getHour() > 22)
+                    throw new UnlawfulActionException("It's too late");
+            }
+            //todo это 2 разные ситуации - 2 исключения со своими сообщениями генерируй+
+        }
+    }
+
+    private ListNode node(int index) {
+        checkIndex(index);
+        int i = 0;
+        ListNode currentNode = head;
+        while (currentNode != null) {
+            if (i == index) {
+                return currentNode;
+            }
+            currentNode = currentNode.getNext();
+            i++;
+        }
+        return null;
     }
 }

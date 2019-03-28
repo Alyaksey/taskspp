@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TableOrder implements Order {
@@ -74,7 +75,7 @@ public class TableOrder implements Order {
 
     @Override
     public boolean contains(Object o) {
-        return Arrays.stream(items).anyMatch(item -> item.equals(o));
+        return Arrays.asList(items).contains(o);
     }
 
     @Override
@@ -89,10 +90,10 @@ public class TableOrder implements Order {
 
             @Override
             public MenuItem next() {
-                //todo NoSuchElementException
+                //todo NoSuchElementException+
                 if (hasNext())
                     return items[currentIndex++];
-                return items[currentIndex];
+                throw new NoSuchElementException("There's no such element");
             }
         };
     }
@@ -159,15 +160,8 @@ public class TableOrder implements Order {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        //todo аналогично RemoveAll(collection)
-        boolean modified = false;
-        for (int i = 0; i < size; i++) {
-            if (!c.contains(items[i])) {
-                remove(items[i]);
-                modified = true;
-            }
-        }
-        return modified;
+        //todo аналогично RemoveAll(collection)+
+        return removeAll(notContainsInCollection, c) > 0;
     }
 
     @Override
@@ -222,11 +216,11 @@ public class TableOrder implements Order {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        int removedElementsCount = removeAll(ContainsInCollection, c);
-        return removedElementsCount > 0;
+        return removeAll(containsInCollection, c) > 0;
     }
 
-    private BiPredicate<Collection<?> , MenuItem> ContainsInCollection = Collection::contains;
+    private BiPredicate<Collection<?>, MenuItem> containsInCollection = Collection::contains;
+    private BiPredicate<Collection<?>, MenuItem> notContainsInCollection = (c, item) -> !c.contains(item);
 
 
     private <T> int removeAll(BiPredicate<T, MenuItem> biPredicate, T object) {
@@ -387,9 +381,10 @@ public class TableOrder implements Order {
 
     @Override
     public ListIterator<MenuItem> listIterator(int index) {
-        //todo учти особенности remove add set - см. документацию
+        //todo учти особенности remove add set - см. документацию+
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
+            MenuItem lastReturned = null;
 
             @Override
             public boolean hasNext() {
@@ -398,9 +393,11 @@ public class TableOrder implements Order {
 
             @Override
             public MenuItem next() {
-                if (hasNext())
-                    return items[currentIndex++];
-                return items[currentIndex];
+                if (hasNext()) {
+                    lastReturned = items[currentIndex++];
+                    return lastReturned;
+                }
+                throw new NoSuchElementException("There's no such element");
             }
 
             @Override
@@ -411,9 +408,10 @@ public class TableOrder implements Order {
             @Override
             public MenuItem previous() {
                 if (hasPrevious()) {
-                    return items[currentIndex--];
+                    lastReturned = items[currentIndex--];
+                    return lastReturned;
                 }
-                return items[currentIndex];
+                throw new NoSuchElementException("There's no such element");
             }
 
             @Override
@@ -432,16 +430,22 @@ public class TableOrder implements Order {
 
             @Override
             public void remove() {
+                if (lastReturned == null)
+                    throw new IllegalStateException("You can't remove item");
+                lastReturned = null;
                 shiftArray(currentIndex);
             }
 
             @Override
             public void set(MenuItem item) {
+                if (lastReturned == null)
+                    throw new IllegalStateException("You can't set the value for item");
                 items[currentIndex] = item;
             }
 
             @Override
             public void add(MenuItem item) {
+                lastReturned = null;
                 TableOrder.this.add(currentIndex, item);
             }
         };
@@ -450,8 +454,8 @@ public class TableOrder implements Order {
     @Override
     public List<MenuItem> subList(int fromIndex, int toIndex) {
         checkBounds(fromIndex, toIndex);
-        //todo возвращаеть нужно экземпляр TableOrder
-        return Arrays.asList(items).subList(fromIndex, toIndex);
+        //todo возвращаеть нужно экземпляр TableOrder+
+        return Arrays.stream(items, fromIndex, toIndex).collect(Collectors.toCollection(TableOrder::new));
     }
 
     private void checkIndex(int index) {
@@ -466,5 +470,19 @@ public class TableOrder implements Order {
             throw new IndexOutOfBoundsException("Index is out of bounds;");
         if (toIndex > size)
             throw new IndexOutOfBoundsException("Index is out of bounds");
+    }
+
+    //todo логичнее в классе оставить+
+    private void checkLawless(MenuItem item) {
+        if (item instanceof Drink) {
+            Drink drink = (Drink) item;
+            if (drink.isAlcoholicDrink()) {
+                if (customer.getAge() < 18)
+                    throw new UnlawfulActionException("You're too young");
+                if (LocalDateTime.now().getHour() > 22)
+                    throw new UnlawfulActionException("It's too late");
+            }
+            //todo это 2 разные ситуации - 2 исключения со своими сообщениями генерируй+
+        }
     }
 }
