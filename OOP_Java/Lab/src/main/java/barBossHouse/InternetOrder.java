@@ -83,10 +83,8 @@ public class InternetOrder implements Order {
         };
     }
 
-    //todo+
     @Override
     public Object[] toArray() {
-        //todo toArray+
         MenuItem[] items = new MenuItem[size];
         ListNode currentNode = head;
         for (int i = 0; i < size; i++) {
@@ -305,22 +303,23 @@ public class InternetOrder implements Order {
 
     @Override
     public MenuItem get(int index) {
-        return node(index).getValue();
+        checkIndex(index);
+        return getNode(index).getValue();
     }
 
     @Override
     public MenuItem set(int index, MenuItem element) {
         checkIndex(index);
-        ListNode node = node(index);
+        ListNode node = getNode(index);
         MenuItem replacedItem = node.getValue();
         node.setValue(element);
-        return replacedItem; //todo возвращаешь замененный Item+
+        return replacedItem;
     }
 
     @Override
     public void add(int index, MenuItem element) {
         checkIndex(index);
-        ListNode previousNode = node(index - 1);
+        ListNode previousNode = getNode(index - 1);
         ListNode currentNode = previousNode.getNext();
         ListNode newNode = new ListNode(element);
         if (currentNode == head) {
@@ -338,7 +337,7 @@ public class InternetOrder implements Order {
 
     @Override
     public MenuItem remove(int index) {
-        ListNode node = node(index);
+        ListNode node = getNode(index);
         MenuItem item = node.getValue();
         remove(item);
         return node.getValue();
@@ -346,24 +345,24 @@ public class InternetOrder implements Order {
 
     @Override
     public int indexOf(Object o) {
-        int indexOfObject = 0; //todo имя+
+        int indexOf = 0;
         for (MenuItem item : this) {
             if (item.equals(o)) {
-                return indexOfObject;
+                return indexOf;
             }
-            indexOfObject++;
+            indexOf++;
         }
         return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        int lastIndexOfObject = 0; //todo имя+
+        int lastIndexO = 0;
         int lastIndex = 0;
         for (MenuItem item : this) {
             if (item.equals(o))
-                lastIndex = lastIndexOfObject;
-            lastIndexOfObject++;
+                lastIndex = lastIndexO;
+            lastIndexO++;
         }
         return lastIndex;
     }
@@ -379,8 +378,7 @@ public class InternetOrder implements Order {
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
             ListNode lastReturned = null;
-            ListNode previousNode = node(index - 1); // todo добавь приватный метод ибо дохера дублирования+
-            //todo текущий элемент+
+            ListNode previousNode = getNode(index - 1);
             ListNode currentNode = previousNode.getNext();
 
             @Override
@@ -402,13 +400,11 @@ public class InternetOrder implements Order {
 
             @Override
             public boolean hasPrevious() {
-                //todo exception+
                 throw new UnsupportedOperationException("This operation is not supported");
             }
 
             @Override
             public MenuItem previous() {
-                //todo exception+
                 throw new UnsupportedOperationException("This operation is not supported");
             }
 
@@ -421,7 +417,6 @@ public class InternetOrder implements Order {
 
             @Override
             public int previousIndex() {
-                //todo exception+
                 throw new UnsupportedOperationException("This operation is not supported");
             }
 
@@ -526,7 +521,6 @@ public class InternetOrder implements Order {
             throw new IndexOutOfBoundsException("Index is out of bounds");
     }
 
-    //todo логичнее в классе оставить+
     private void checkLawless(MenuItem item) {
         if (item instanceof Drink) {
             Drink drink = (Drink) item;
@@ -536,21 +530,21 @@ public class InternetOrder implements Order {
                 if (LocalDateTime.now().getHour() > 22)
                     throw new UnlawfulActionException("It's too late");
             }
-            //todo это 2 разные ситуации - 2 исключения со своими сообщениями генерируй+
         }
     }
 
-    private ListNode node(int index) {
+    private ListNode getNode(int index) {
         checkIndex(index);
         int i = 0;
         ListNode currentNode = head;
+        //todo for i
         while (currentNode != null) {
             if (i == index) {
-                return currentNode;
+                break;
             }
             currentNode = currentNode.getNext();
             i++;
         }
-        return null;
+        return currentNode;
     }
 }

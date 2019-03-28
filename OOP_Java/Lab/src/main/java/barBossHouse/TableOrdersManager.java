@@ -27,23 +27,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
 
     @Override
     public boolean addAll(int index, Collection<? extends Order> c) {
-        checkIndex(index);
-        if (c.size() + index > tablesCount(Objects::isNull)) {
-            try {
-                throw new NoFreeTableException("There are not enough of free tables");
-            } catch (NoFreeTableException e) {
-                e.printStackTrace();
-            }
-        }
-        int[] freeTableNumbers = freeTableNumbers();
-        int i = 0;
-        while (freeTableNumbers[i] < index) {
-            i++;
-        }
-        for (Order o : c) {
-            orders[freeTableNumbers[i++]] = o;
-        }
-        return true;
+        return false;
     }
 
     @Override
@@ -84,7 +68,6 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
         orders[index] = null;
         return removedItem;
     }
-
 
     @Override
     public int indexOf(Object o) {
@@ -331,22 +314,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
 
     @Override
     public Iterator<Order> iterator() {
-        return new Iterator<Order>() {
-            int currentIndex = 0;
-
-            @Override
-            public boolean hasNext() {
-                return currentIndex < orders.length;
-            }
-
-            @Override
-            public Order next() {
-                if (hasNext()) {
-                    return orders[currentIndex++];
-                }
-                throw new NoSuchElementException("There's no such element");
-            }
-        };
+        return listIterator();
     }
 
     @Override
@@ -385,7 +353,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     @Override
     public boolean remove(Object o) {
         for (int i = 0; i < orders.length; i++) {
-            if (Objects.nonNull(orders[i])) {
+            if (Objects.nonNull(orders[i]) && orders[i].equals(o)) {
                 orders[i] = null;
                 return true;
             }

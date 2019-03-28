@@ -38,8 +38,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     private void checkNull(Order order) {
-        if (order == null)
-            throw new NullPointerException("You cannot add null element");
+        Objects.requireNonNull(order, "You cannot add null element");
     }
 
     @Override
@@ -379,6 +378,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
 
+    //todo далее foreach или stream
     @Override
     public int ordersCostSummary() {
         int ordersCostSummary = 0;

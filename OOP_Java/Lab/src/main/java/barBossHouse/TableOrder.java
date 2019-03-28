@@ -90,7 +90,6 @@ public class TableOrder implements Order {
 
             @Override
             public MenuItem next() {
-                //todo NoSuchElementException+
                 if (hasNext())
                     return items[currentIndex++];
                 throw new NoSuchElementException("There's no such element");
@@ -160,7 +159,6 @@ public class TableOrder implements Order {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        //todo аналогично RemoveAll(collection)+
         return removeAll(notContainsInCollection, c) > 0;
     }
 
@@ -381,7 +379,6 @@ public class TableOrder implements Order {
 
     @Override
     public ListIterator<MenuItem> listIterator(int index) {
-        //todo учти особенности remove add set - см. документацию+
         return new ListIterator<MenuItem>() {
             int currentIndex = index;
             MenuItem lastReturned = null;
@@ -454,7 +451,6 @@ public class TableOrder implements Order {
     @Override
     public List<MenuItem> subList(int fromIndex, int toIndex) {
         checkBounds(fromIndex, toIndex);
-        //todo возвращаеть нужно экземпляр TableOrder+
         return Arrays.stream(items, fromIndex, toIndex).collect(Collectors.toCollection(TableOrder::new));
     }
 
@@ -472,7 +468,6 @@ public class TableOrder implements Order {
             throw new IndexOutOfBoundsException("Index is out of bounds");
     }
 
-    //todo логичнее в классе оставить+
     private void checkLawless(MenuItem item) {
         if (item instanceof Drink) {
             Drink drink = (Drink) item;
@@ -482,7 +477,6 @@ public class TableOrder implements Order {
                 if (LocalDateTime.now().getHour() > 22)
                     throw new UnlawfulActionException("It's too late");
             }
-            //todo это 2 разные ситуации - 2 исключения со своими сообщениями генерируй+
         }
     }
 }
