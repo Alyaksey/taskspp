@@ -393,6 +393,7 @@ public class InternetOrder implements Order {
                 if (hasNext()) {
                     lastReturned = currentNode;
                     currentNode = currentNode.getNext();
+                    previousNode = previousNode.getNext();
                     currentIndex++;
                     return lastReturned.getValue();
                 }
