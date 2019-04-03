@@ -3,6 +3,7 @@ package barBossHouse;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     private QueueNode head;
@@ -360,6 +361,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     public Iterator<Order> descendingIterator() {
         return new Iterator<Order>() {
             QueueNode currentNode = tail;
+
             @Override
             public boolean hasNext() {
                 return currentNode.getPrev() != null;
@@ -369,7 +371,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
             public Order next() {
                 if (hasNext()) {
                     Order order = currentNode.getValue();
-                    currentNode = currentNode.getPrev() ;
+                    currentNode = currentNode.getPrev();
                     return order;
                 }
                 throw new NoSuchElementException("No such element");
@@ -378,16 +380,10 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
 
-    //todo далее foreach или stream
+    //todo далее foreach или stream+
     @Override
     public int ordersCostSummary() {
-        int ordersCostSummary = 0;
-        QueueNode currentNode = head;
-        while (currentNode != null) {
-            ordersCostSummary += currentNode.getValue().costTotal();
-            currentNode = currentNode.getNext();
-        }
-        return ordersCostSummary;
+        return this.stream().mapToInt(order -> (int) order.costTotal()).sum();
     }
 
     @Override
@@ -401,13 +397,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     private int itemsQuantity(Function<Order, Integer> function) {
-        int itemsQuantity = 0;
-        QueueNode currentNode = head;
-        while (currentNode != null) {
-            itemsQuantity += function.apply(currentNode.getValue());
-            currentNode = currentNode.getNext();
-        }
-        return itemsQuantity;
+        return this.stream().mapToInt(function::apply).sum();
     }
 
 
@@ -432,14 +422,8 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     private <T> List<Order> getOrders(BiPredicate<T, Order> biPredicate, T object) {
-        List<Order> orders = new LinkedList<>();
-        QueueNode currentNode = head;
-        while (currentNode != null) {
-            if (biPredicate.test(object, currentNode.getValue()))
-                orders.add(currentNode.getValue());
-            currentNode = currentNode.getNext();
-        }
-        return orders;
+        return this.stream().filter(order -> biPredicate.test(object, order)).collect(Collectors.toCollection(LinkedList::new));
+
     }
 
     private class QueueNode {

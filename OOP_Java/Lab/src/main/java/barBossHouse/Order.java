@@ -1,11 +1,12 @@
 package barBossHouse;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public interface Order extends List<MenuItem> {
+public interface Order extends List<MenuItem>, Serializable {
     LocalDateTime getDateTime();
 
     void setDateTime(LocalDateTime dateTime);
@@ -34,23 +35,7 @@ public interface Order extends List<MenuItem> {
     @Override
     int hashCode();
 
-    default boolean isEquals(Object obj){
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        TableOrder tableOrder = (TableOrder) obj;
-        if (this.getCustomer().equals(tableOrder.getCustomer()) && this.size() == tableOrder.size()
-                && this.getDateTime().equals(tableOrder.getDateTime())) {
-            String[] itemsNames = itemsNames();
-            for (String itemsName : itemsNames) {
-                if (itemQuantity(itemsName) != tableOrder.itemQuantity(itemsName))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
+    String toFileString();
 
     default MenuItem[] sortedItemsByCostDesc() {
         MenuItem[] sortedItems = (MenuItem[]) toArray();
@@ -61,7 +46,7 @@ public interface Order extends List<MenuItem> {
     default boolean isEqual(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null || getClass() != obj.getClass())
+        if (!(obj instanceof Order))
             return false;
         Order order;
         if (obj instanceof InternetOrder)

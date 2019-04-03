@@ -84,6 +84,10 @@ public final class Address {
                 apartmentNumber);
     }
 
+    public String toFileString() {
+        return String.format("%s %d %s %d %s %d\n", cityName, zipCode, streetName, buildingNumber, buildingLetter, apartmentNumber);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

@@ -1,6 +1,7 @@
 package barBossHouse;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -277,11 +278,14 @@ public class InternetOrder implements Order {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("InternetOrder:\n").append(customer.toString()).append("\n").append(size).append("\n");
-        ListNode currentNode = head;
-        while (currentNode != null) {
-            sb.append(currentNode.getValue().toString()).append("\n");
-            currentNode = currentNode.getNext();
-        }
+        this.forEach(item -> sb.append(item.toString()).append("\n"));
+        return sb.toString();
+    }
+
+    public String toFileString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(dateTime.toEpochSecond(ZoneOffset.UTC)).append("\n").append(customer.toFileString()).append(size).append("\n");
+        this.forEach(item -> sb.append(item.toFileString()));
         return sb.toString();
     }
 
@@ -319,6 +323,7 @@ public class InternetOrder implements Order {
     @Override
     public void add(int index, MenuItem element) {
         checkIndex(index);
+        checkLawless(element);
         ListNode previousNode = getNode(index - 1);
         ListNode currentNode = previousNode.getNext();
         ListNode newNode = new ListNode(element);
@@ -535,15 +540,10 @@ public class InternetOrder implements Order {
 
     private ListNode getNode(int index) {
         checkIndex(index);
-        int i = 0;
         ListNode currentNode = head;
-        //todo for i
-        while (currentNode != null) {
-            if (i == index) {
-                break;
-            }
+        //todo for i+
+        for (int i = 0; i <= index; i++) {
             currentNode = currentNode.getNext();
-            i++;
         }
         return currentNode;
     }

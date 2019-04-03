@@ -1,17 +1,21 @@
 package barBossHouse;
 
 public final class Dish extends MenuItem {
-    protected Dish(String name, String description) {
+    public Dish(String name, String description) {
         super(name, description);
     }
 
-    protected Dish(double cost, String name, String description) {
+    public Dish(double cost, String name, String description) {
         super(cost, name, description);
     }
 
     @Override
     public String toString() {
         return String.format("Dish: %s %s", super.toString(), getDescription());
+    }
+
+    public String toFileString() {
+        return String.format("Dish %s %s\n", super.toFileString(), getDescription());
     }
 
     @Override

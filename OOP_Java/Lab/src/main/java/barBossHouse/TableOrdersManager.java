@@ -1,5 +1,6 @@
 package barBossHouse;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.*;
@@ -175,7 +176,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
         return subList;
     }
 
-    public int remove(Order order) {
+    public int remove(Order order) throws IOException {
         for (int i = 0; i < orders.length; i++) {
             if (order.equals(orders[i])) {
                 remove(i);
@@ -187,7 +188,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
 
     private BiPredicate<Object, Order> areEquals = Object::equals;
 
-    public int removeAll(Order order) {
+    public int removeAll(Order order) throws IOException {
         return removeAll(areEquals, order);
     }
 

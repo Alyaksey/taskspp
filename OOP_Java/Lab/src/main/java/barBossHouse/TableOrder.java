@@ -1,6 +1,7 @@
 package barBossHouse;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -326,6 +327,14 @@ public class TableOrder implements Order {
     }
 
     @Override
+    public String toFileString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(dateTime.toEpochSecond(ZoneOffset.UTC)).append("\n").append(customer.toFileString()).append(size).append("\n");
+        IntStream.range(0, size).forEach(i -> sb.append(items[i].toFileString()));
+        return sb.toString();
+    }
+
+    @Override
     public MenuItem get(int index) {
         checkIndex(index);
         return items[index];
@@ -340,8 +349,9 @@ public class TableOrder implements Order {
     }
 
     @Override
-    public void add(int index, MenuItem element) {
+    public void add(int index, MenuItem element) throws UnlawfulActionException {
         checkIndex(index);
+        checkLawless(element);
         if (size == items.length)
             increaseCapacity();
         System.arraycopy(items, index, items, index + 1, size - index);

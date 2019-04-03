@@ -43,6 +43,10 @@ public final class Customer {
         return secondName;
     }
 
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
     public int getAge() {
         return Period.between(LocalDate.now(), birthDate).getYears();
     }
@@ -61,6 +65,10 @@ public final class Customer {
                 .append(Objects.toString(birthDate, ""))
                 .append(", ").append(Objects.toString(address, ""));
         return sb.toString();
+    }
+
+    public String toFileString() {
+        return String.format("%s %s %d\n%s", firstName, secondName, birthDate.toEpochDay(), address.toFileString());
     }
 
     @Override

@@ -43,8 +43,12 @@ public final class Drink extends MenuItem implements Alcoholable {
     @Override
     public String toString() {
         return isAlcoholicDrink() ?
-                String.format("Drink: %s, %s, Alcohol: %.2f%% %s", type, super.toString(), alcoholVol, type) :
+                String.format("Drink: %s, %s, Alcohol: %.1f%% %s", type, super.toString(), alcoholVol, type) :
                 String.format("Drink: %s, %s", type, super.toString());
+    }
+
+    public String toFileString() {
+        return String.format("Drink %s %s %s %.1f\n", super.toFileString(), getDescription(), type, alcoholVol);
     }
 
     @Override

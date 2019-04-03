@@ -55,6 +55,10 @@ public abstract class MenuItem implements Comparable<MenuItem> {
         return String.format("%s, %.2fр.", Objects.toString(name, ""), cost);
     }
 
+    public String toFileString() {
+        return String.format("%s %f", name, cost);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
