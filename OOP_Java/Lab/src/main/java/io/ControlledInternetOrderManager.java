@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class ControlledInternetOrderManager extends InternetOrdersManager {
     protected Source<Order> source;
-    private OrdersFactory factory;
+    protected OrdersFactory factory;
 
     public ControlledInternetOrderManager(Source<Order> source, OrdersFactory factory) {
         super();
