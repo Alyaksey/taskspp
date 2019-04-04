@@ -24,7 +24,11 @@ public class OrdersManagerSerializedFileSource extends OrderManagerFileSource {
     public void load(Order order) throws IOException {
         Path path = Paths.get(getPath() + order.getDateTime().toEpochSecond(ZoneOffset.UTC) + EXTENSION);
         try (ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(path))) {
-            order = (Order) inputStream.readObject();
+            Order readedOrder = (Order) inputStream.readObject();
+            order.clear();
+            order.setDateTime(readedOrder.getDateTime());
+            order.setCustomer(readedOrder.getCustomer());
+            order.addAll(readedOrder);
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }

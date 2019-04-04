@@ -541,7 +541,6 @@ public class InternetOrder implements Order {
     private ListNode getNode(int index) {
         checkIndex(index);
         ListNode currentNode = head;
-        //todo for i+
         for (int i = 0; i <= index; i++) {
             currentNode = currentNode.getNext();
         }

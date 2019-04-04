@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.List;
 
 public class OrdersManagerBinaryFileSource extends OrderManagerFileSource {
     private static String EXTENSION = ".bin";
@@ -24,14 +25,14 @@ public class OrdersManagerBinaryFileSource extends OrderManagerFileSource {
         DataInputStream inputStream = new DataInputStream(new BufferedInputStream(Files.newInputStream(path)));
         Customer customer = loadCustomer(inputStream);
         LocalDateTime orderTime = LocalDateTime.ofEpochSecond(inputStream.readLong(), 0, ZoneOffset.UTC);
-        MenuItem[] items = loadMenuItems(inputStream);
+        List<MenuItem> items = loadMenuItems(inputStream);
         inputStream.close();
         order.clear();
         order.setCustomer(customer);
         order.setDateTime(orderTime);
-        order.addAll(Arrays.asList(items));
+        order.addAll(items);
     }
-
+    //todo возвращй ArrayList по ссылке List
     private MenuItem[] loadMenuItems(DataInputStream inputStream) throws IOException {
         int size = inputStream.readInt();
         MenuItem[] items = new MenuItem[size];

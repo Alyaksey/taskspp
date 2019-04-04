@@ -45,11 +45,11 @@ public class ControlledInternetOrder extends InternetOrder {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        if (super.retainAll(c)) {
+        boolean result = super.retainAll(c);
+        if (result) {
             isChanged = true;
-            return true;
         }
-        return false;
+        return result;
     }
 
     @Override

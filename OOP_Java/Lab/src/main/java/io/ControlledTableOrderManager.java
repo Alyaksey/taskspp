@@ -7,6 +7,8 @@ import factory.OrdersFactory;
 import java.io.IOException;
 import java.util.Collection;
 
+//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными
+//todo метод добадвения menuitem к ордеру (там надо store() делать)
 public class ControlledTableOrderManager extends TableOrdersManager {
     protected Source<Order> source;
     private OrdersFactory factory;

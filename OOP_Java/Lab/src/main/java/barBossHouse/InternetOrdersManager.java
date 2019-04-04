@@ -380,7 +380,6 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
 
-    //todo далее foreach или stream+
     @Override
     public int ordersCostSummary() {
         return this.stream().mapToInt(order -> (int) order.costTotal()).sum();

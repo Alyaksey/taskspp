@@ -52,6 +52,7 @@ public class OrdersManagerTextFileSource extends OrderManagerFileSource {
         return new Address(city, zipCode, streetName, buildingNumber, buildingLetter, apartmentNumber);
     }
 
+    //todo возвращй ArrayList по ссылке List
     private MenuItem[] loadItems(Scanner scanner) {
         int size = scanner.nextInt();
         MenuItem[] items = new MenuItem[size];

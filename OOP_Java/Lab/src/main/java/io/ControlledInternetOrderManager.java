@@ -8,6 +8,7 @@ import factory.OrdersFactory;
 import java.io.IOException;
 import java.util.Collection;
 
+//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными
 public class ControlledInternetOrderManager extends InternetOrdersManager {
     protected Source<Order> source;
     protected OrdersFactory factory;
