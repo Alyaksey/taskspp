@@ -25,11 +25,9 @@ public class ControlledTableOrderManager extends TableOrdersManager {
         this.source = source;
     }
 
-    private ControlledTableOrder getControlledOrder(Order order) {
-        return (ControlledTableOrder) factory.createInternetOrder(order);
-    }
 
-    private void create(ControlledTableOrder tableOrder) {
+    private void createControlledOrder(Order order) {
+        ControlledTableOrder tableOrder = (ControlledTableOrder) factory.createTableOrder(order);
         try {
             source.create(tableOrder);
         } catch (IOException ex) {
@@ -47,13 +45,13 @@ public class ControlledTableOrderManager extends TableOrdersManager {
 
     @Override
     public boolean addAll(int index, Collection<? extends Order> c) {
-        c.forEach(order -> create(getControlledOrder(order)));
+        c.forEach(this::createControlledOrder);
         return super.addAll(index, c);
     }
 
     @Override
     public void add(int index, Order element) {
-        create(getControlledOrder(element));
+        createControlledOrder(element);
         super.add(index, element);
     }
 
@@ -65,7 +63,7 @@ public class ControlledTableOrderManager extends TableOrdersManager {
 
     @Override
     public boolean add(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         return super.add(order);
     }
 
@@ -77,7 +75,7 @@ public class ControlledTableOrderManager extends TableOrdersManager {
 
     @Override
     public boolean addAll(Collection<? extends Order> c) {
-        c.forEach(order -> create(getControlledOrder(order)));
+        c.forEach(this::createControlledOrder);
         return super.addAll(c);
     }
 

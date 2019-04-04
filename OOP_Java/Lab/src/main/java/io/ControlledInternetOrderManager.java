@@ -24,11 +24,8 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
         this.factory = factory;
     }
 
-    private ControlledInternetOrder getControlledOrder(Order order) {
-        return (ControlledInternetOrder) factory.createInternetOrder(order);
-    }
-
-    private void create(ControlledInternetOrder internetOrder) {
+    private void createControlledOrder(Order order) {
+        ControlledInternetOrder internetOrder = (ControlledInternetOrder) factory.createInternetOrder(order);
         try {
             source.create(internetOrder);
         } catch (IOException ex) {
@@ -46,37 +43,37 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
 
     @Override
     public void addFirst(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         super.addFirst(order);
     }
 
     @Override
     public void addLast(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         super.addLast(order);
     }
 
     @Override
     public boolean offerFirst(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         return super.offerFirst(order);
     }
 
     @Override
     public boolean offerLast(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         return super.offerLast(order);
     }
 
     @Override
     public Order removeFirst() {
-        create(getControlledOrder(super.getFirst()));
+        createControlledOrder(super.getFirst());
         return super.removeFirst();
     }
 
     @Override
     public Order removeLast() {
-        create(getControlledOrder(super.getLast()));
+        createControlledOrder(super.getLast());
         return super.removeLast();
     }
 
@@ -106,7 +103,7 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
 
     @Override
     public boolean add(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         return super.add(order);
     }
 
@@ -118,7 +115,7 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
 
     @Override
     public boolean addAll(Collection<? extends Order> c) {
-        c.forEach(order -> create(getControlledOrder(order)));
+        c.forEach(this::createControlledOrder);
         return super.addAll(c);
     }
 
@@ -142,7 +139,7 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
 
     @Override
     public boolean offer(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         return super.offer(order);
     }
 
@@ -160,7 +157,7 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
 
     @Override
     public void push(Order order) {
-        create(getControlledOrder(order));
+        createControlledOrder(order);
         super.push(order);
     }
 
