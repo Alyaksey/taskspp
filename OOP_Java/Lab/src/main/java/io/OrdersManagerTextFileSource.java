@@ -24,12 +24,12 @@ public class OrdersManagerTextFileSource extends OrderManagerFileSource {
     public void load(Order order) throws IOException {
         Path path = Paths.get(getPath() + order.getDateTime().toEpochSecond(ZoneOffset.UTC) + EXTENSION);
         Scanner scanner = new Scanner(path);
-        LocalDateTime loadOrderTime = LocalDateTime.ofEpochSecond(scanner.nextLong(), 0, ZoneOffset.UTC);
+        LocalDateTime orderTime = LocalDateTime.ofEpochSecond(scanner.nextLong(), 0, ZoneOffset.UTC);
         Customer customer = loadCustomer(scanner);
         MenuItem[] items = loadItems(scanner);
         scanner.close();
         order.clear();
-        order.setDateTime(loadOrderTime);
+        order.setDateTime(orderTime);
         order.setCustomer(customer);
         order.addAll(Arrays.asList(items));
     }
