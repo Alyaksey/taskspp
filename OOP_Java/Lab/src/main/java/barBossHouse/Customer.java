@@ -1,10 +1,11 @@
 package barBossHouse;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Objects;
 
-public final class Customer {
+public final class Customer implements Serializable {
     private final String firstName;
     private final String secondName;
     private final LocalDate birthDate;

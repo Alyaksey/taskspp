@@ -1,8 +1,9 @@
 package barBossHouse;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class MenuItem implements Comparable<MenuItem> {
+public abstract class MenuItem implements Comparable<MenuItem>, Serializable {
     private double cost;
     private String name;
     private String description;

@@ -1,8 +1,9 @@
 package barBossHouse;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public final class Address {
+public final class Address implements Serializable {
     private final String cityName;
     private final int zipCode;
     private final String streetName;
