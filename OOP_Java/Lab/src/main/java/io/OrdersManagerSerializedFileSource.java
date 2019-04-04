@@ -27,10 +27,7 @@ public class OrdersManagerSerializedFileSource extends OrderManagerFileSource {
         try (ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(path))) {
             loadedOrder = (Order) inputStream.readObject();
             inputStream.close();
-            order.clear();
-            order.addAll(Arrays.asList((MenuItem[]) loadedOrder.toArray()));
-            order.setDateTime(loadedOrder.getDateTime());
-            order.setCustomer(loadedOrder.getCustomer());
+            order = loadedOrder;
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
