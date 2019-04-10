@@ -24,8 +24,9 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public void addFirst(Order order) {
+    public void addFirst(Order order) throws AlreadyAddedException {
         checkNull(order);
+        checkDuplicates(order);
         QueueNode newNode = new QueueNode(order);
         if (head == null) {
             head = newNode;
@@ -43,8 +44,14 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public void addLast(Order order) {
+    public void addLast(Order order) throws AlreadyAddedException {
         checkNull(order);
+        checkDuplicates(order);
+        try {
+            checkDuplicates(order);
+        } catch (AlreadyAddedException e) {
+            e.printStackTrace();
+        }
         QueueNode newNode = new QueueNode(order);
         if (head == null) {
             head = newNode;
@@ -58,7 +65,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public boolean offerFirst(Order order) {
+    public boolean offerFirst(Order order) throws AlreadyAddedException {
         try {
             addFirst(order);
             return true;
@@ -68,11 +75,12 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public boolean offerLast(Order order) {
+    public boolean offerLast(Order order) throws AlreadyAddedException {
         try {
+            checkDuplicates(order);
             addLast(order);
             return true;
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException | AlreadyAddedException ex) {
             return false;
         }
     }
@@ -230,12 +238,8 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
         return a;
     }
 
-    public boolean add(Order order) {
-        try {
-            checkDuplicates(order);
-        } catch (AlreadyAddedException e) {
-            e.printStackTrace();
-        }
+    public boolean add(Order order) throws AlreadyAddedException {
+        checkDuplicates(order);
         QueueNode node = new QueueNode(order);
         if (head == null) {
             head = node;
@@ -280,7 +284,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Order> c) {
+    public boolean addAll(Collection<? extends Order> c) throws AlreadyAddedException {
         c.forEach(this::add);
         return true;
     }
@@ -301,7 +305,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public boolean offer(Order order) {
+    public boolean offer(Order order) throws AlreadyAddedException {
         try {
             checkEmptiness();
             add(order);
@@ -348,7 +352,7 @@ public class InternetOrdersManager implements OrdersManager, Deque<Order> {
     }
 
     @Override
-    public void push(Order order) {
+    public void push(Order order) throws AlreadyAddedException {
         addFirst(order);
     }
 

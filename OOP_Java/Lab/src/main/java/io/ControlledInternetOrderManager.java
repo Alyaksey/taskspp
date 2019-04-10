@@ -7,11 +7,12 @@ import factory.OrdersFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 
-//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными
+//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными+
 public class ControlledInternetOrderManager extends InternetOrdersManager {
-    protected Source<Order> source;
-    protected OrdersFactory factory;
+    private Source<Order> source;
+    private OrdersFactory factory;
 
     public ControlledInternetOrderManager(Source<Order> source, OrdersFactory factory) {
         super();
@@ -30,7 +31,7 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
         try {
             source.create(internetOrder);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            remove(order);
         }
     }
 
@@ -38,134 +39,166 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
         try {
             source.delete(order);
         } catch (IOException e) {
-            e.printStackTrace();
+            add(order);
         }
     }
 
     @Override
-    public void addFirst(Order order) {
-        createControlledOrder(order);
+    public void addFirst(Order order) throws AlreadyAddedException {
         super.addFirst(order);
+        createControlledOrder(order);
     }
 
     @Override
-    public void addLast(Order order) {
-        createControlledOrder(order);
+    public void addLast(Order order) throws AlreadyAddedException {
         super.addLast(order);
+        createControlledOrder(order);
     }
 
     @Override
-    public boolean offerFirst(Order order) {
+    public boolean offerFirst(Order order) throws AlreadyAddedException {
+        boolean isOffered = super.offerFirst(order);
         createControlledOrder(order);
-        return super.offerFirst(order);
+        return isOffered;
     }
 
     @Override
-    public boolean offerLast(Order order) {
+    public boolean offerLast(Order order) throws AlreadyAddedException {
+        boolean isOffered = super.offerLast(order);
         createControlledOrder(order);
-        return super.offerLast(order);
+        return isOffered;
     }
 
     @Override
     public Order removeFirst() {
-        createControlledOrder(super.getFirst());
-        return super.removeFirst();
+        Order removedOrder = super.removeFirst();
+        if (Objects.nonNull(removedOrder))
+            delete(super.getFirst());
+        return removedOrder;
     }
 
     @Override
     public Order removeLast() {
-        createControlledOrder(super.getLast());
+        Order removedOrder = super.removeLast();
+        if (Objects.nonNull(removedOrder))
+            delete(super.getLast());
         return super.removeLast();
     }
 
     @Override
     public Order pollFirst() {
-        delete(super.getFirst());
-        return super.pollFirst();
+        Order polledOrder = super.pollFirst();
+        if (Objects.nonNull(polledOrder))
+            delete(super.getFirst());
+        return polledOrder;
     }
 
     @Override
     public Order pollLast() {
-        delete(super.getLast());
-        return super.pollLast();
+        Order polledOrder = super.pollLast();
+        if (Objects.nonNull(polledOrder))
+            delete(super.getLast());
+        return polledOrder;
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        delete((Order) o);
-        return super.removeFirstOccurrence(o);
+        boolean isRemoved = super.removeFirstOccurrence(o);
+        if (isRemoved)
+            delete((Order) o);
+        return isRemoved;
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        delete((Order) o);
-        return super.removeLastOccurrence(o);
+        boolean isRemoved = super.removeLastOccurrence(o);
+        if (isRemoved)
+            delete((Order) o);
+        return isRemoved;
     }
 
     @Override
-    public boolean add(Order order) {
+    public boolean add(Order order) throws AlreadyAddedException {
+        boolean isAdded = super.add(order);
         createControlledOrder(order);
-        return super.add(order);
+        return isAdded;
     }
 
     @Override
     public boolean remove(Object o) {
-        delete((Order) o);
-        return super.remove(o);
+        boolean isRemoved = super.remove(o);
+        if (isRemoved)
+            delete((Order) o);
+        return isRemoved;
     }
 
     @Override
-    public boolean addAll(Collection<? extends Order> c) {
-        c.forEach(this::createControlledOrder);
-        return super.addAll(c);
+    public boolean addAll(Collection<? extends Order> c) throws AlreadyAddedException {
+        try {
+            boolean areAdded = super.addAll(c);
+            c.forEach(this::createControlledOrder);
+            return areAdded;
+        } catch (AlreadyAddedException e) {
+            super.removeAll(c);
+        }
+        return false;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        boolean areRemoved = super.removeAll(c);
         c.forEach(obj -> delete((Order) obj));
-        return super.removeAll(c);
+        return areRemoved;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        boolean areRetained = super.retainAll(c);
         this.stream().filter(order -> !c.contains(order)).forEach(this::delete);
-        return super.retainAll(c);
+        return areRetained;
     }
 
     @Override
     public void clear() {
-        this.forEach(this::delete);
         super.clear();
+        this.forEach(this::delete);
     }
 
     @Override
-    public boolean offer(Order order) {
+    public boolean offer(Order order) throws AlreadyAddedException {
+        boolean isOffered = super.offer(order);
         createControlledOrder(order);
-        return super.offer(order);
+        return isOffered;
     }
 
     @Override
     public Order remove() {
-        delete(getFirst());
-        return super.remove();
+        Order removedOrder = super.remove();
+        if (Objects.nonNull(removedOrder))
+            delete(getFirst());
+        return removedOrder;
     }
 
     @Override
     public Order poll() {
-        delete(getFirst());
-        return super.poll();
+        Order polledOrder = super.poll();
+        if (Objects.nonNull(polledOrder))
+            delete(getFirst());
+        return polledOrder;
     }
 
     @Override
-    public void push(Order order) {
-        createControlledOrder(order);
+    public void push(Order order) throws AlreadyAddedException {
         super.push(order);
+        createControlledOrder(order);
     }
 
     @Override
     public Order pop() {
-        delete(super.getFirst());
-        return super.pop();
+        Order poppedOrder = super.pop();
+        if (Objects.nonNull(poppedOrder))
+            delete(super.getFirst());
+        return poppedOrder;
     }
 
     public void store() {

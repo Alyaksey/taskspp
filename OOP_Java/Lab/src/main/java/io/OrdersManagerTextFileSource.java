@@ -10,7 +10,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class OrdersManagerTextFileSource extends OrderManagerFileSource {
@@ -22,16 +23,16 @@ public class OrdersManagerTextFileSource extends OrderManagerFileSource {
 
     @Override
     public void load(Order order) throws IOException {
-        Path path = Paths.get(getPath() + order.getDateTime().toEpochSecond(ZoneOffset.UTC) + EXTENSION);
+        LocalDateTime orderTime = order.getDateTime();
+        Path path = Paths.get(getPath() + orderTime.toEpochSecond(ZoneOffset.UTC) + EXTENSION);
         Scanner scanner = new Scanner(path);
-        LocalDateTime orderTime = LocalDateTime.ofEpochSecond(scanner.nextLong(), 0, ZoneOffset.UTC);
         Customer customer = loadCustomer(scanner);
-        MenuItem[] items = loadItems(scanner);
+        List<MenuItem> items = loadItems(scanner);
         scanner.close();
         order.clear();
         order.setDateTime(orderTime);
         order.setCustomer(customer);
-        order.addAll(Arrays.asList(items));
+        order.addAll(items);
     }
 
     private Customer loadCustomer(Scanner scanner) {
@@ -52,10 +53,10 @@ public class OrdersManagerTextFileSource extends OrderManagerFileSource {
         return new Address(city, zipCode, streetName, buildingNumber, buildingLetter, apartmentNumber);
     }
 
-    //todo возвращй ArrayList по ссылке List
-    private MenuItem[] loadItems(Scanner scanner) {
+    //todo возвращй ArrayList по ссылке List+
+    private List<MenuItem> loadItems(Scanner scanner) {
         int size = scanner.nextInt();
-        MenuItem[] items = new MenuItem[size];
+        List<MenuItem> items = new ArrayList<>(size);
         String type, name, description, drinkType;
         double cost;
         double alcoholVol;
@@ -67,9 +68,9 @@ public class OrdersManagerTextFileSource extends OrderManagerFileSource {
             if (type.equals("Drink")) {
                 drinkType = scanner.next();
                 alcoholVol = scanner.nextDouble();
-                items[i] = new Drink(cost, name, description, alcoholVol, DrinkTypeEnum.valueOf(drinkType));
+                items.add(new Drink(cost, name, description, alcoholVol, DrinkTypeEnum.valueOf(drinkType)));
             } else
-                items[i] = new Dish(cost, description, name);
+                items.add(new Dish(cost, description, name));
         }
         return items;
     }

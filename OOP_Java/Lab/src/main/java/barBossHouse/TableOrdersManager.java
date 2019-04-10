@@ -27,8 +27,20 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Order> c) {
-        return false;
+    public boolean addAll(int index, Collection<? extends Order> c) throws NoFreeTableException {
+        checkIndex(index);
+        if (c.size() + index > tablesCount(Objects::isNull)) {
+                throw new NoFreeTableException("There are not enough of free tables");
+        }
+        int[] freeTableNumbers = freeTableNumbers();
+        int i = 0;
+        while (freeTableNumbers[i] < index) {
+            i++;
+        }
+        for (Order o : c) {
+            orders[freeTableNumbers[i++]] = o;
+        }
+        return true;
     }
 
     @Override
@@ -48,14 +60,10 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     }
 
     @Override
-    public void add(int index, Order element) {
+    public void add(int index, Order element) throws AlreadyAddedException {
         checkIndex(index);
         if (Objects.nonNull(orders[index])) {
-            try {
                 throw new AlreadyAddedException("This table is busy");
-            } catch (AlreadyAddedException e) {
-                e.printStackTrace();
-            }
         }
         orders[index] = element;
     }
@@ -176,7 +184,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
         return subList;
     }
 
-    public int remove(Order order) throws IOException {
+    public int remove(Order order) {
         for (int i = 0; i < orders.length; i++) {
             if (order.equals(orders[i])) {
                 remove(i);
@@ -283,7 +291,7 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     }
 
     private int tablesCount(Predicate<Order> predicate) {
-        return (int) Arrays.stream(orders).filter(predicate::test).count();
+        return (int) Arrays.stream(orders).filter(predicate).count();
     }
 
     private int[] getTableNumbers(Predicate<Order> predicate) {
@@ -341,14 +349,14 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     }
 
     @Override
-    public boolean add(Order order) {
+    public boolean add(Order order) throws NoFreeTableException {
         for (int i = 0; i < orders.length; i++) {
             if (Objects.isNull(orders[i])) {
                 orders[i] = order;
                 return true;
             }
         }
-        return false;
+        throw new NoFreeTableException("There are no free tables");
     }
 
     @Override
@@ -368,13 +376,9 @@ public class TableOrdersManager implements OrdersManager, List<Order> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Order> c) {
+    public boolean addAll(Collection<? extends Order> c) throws NoFreeTableException {
         if (c.size() > tablesCount(Objects::isNull)) {
-            try {
                 throw new NoFreeTableException("There are not enough of free tables");
-            } catch (NoFreeTableException e) {
-                e.printStackTrace();
-            }
         }
         int i = 0;
         int[] freeTableNumbers = freeTableNumbers();

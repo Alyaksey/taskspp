@@ -1,17 +1,17 @@
 package io;
 
-import barBossHouse.Order;
-import barBossHouse.TableOrdersManager;
+import barBossHouse.*;
 import factory.OrdersFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 
-//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными
-//todo метод добадвения menuitem к ордеру (там надо store() делать)
+//todo при исключениях надобы откатить действия, чтобы данные в FS и списке были консистентными+
+//todo метод добадвения menuitem к ордеру (там надо store() делать)+
 public class ControlledTableOrderManager extends TableOrdersManager {
     protected Source<Order> source;
-    private OrdersFactory factory;
+    protected OrdersFactory factory;
 
     public ControlledTableOrderManager(int tableCount, Source<Order> source, OrdersFactory factory) {
         super(tableCount);
@@ -33,7 +33,7 @@ public class ControlledTableOrderManager extends TableOrdersManager {
         try {
             source.create(tableOrder);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            remove(order);
         }
     }
 
@@ -41,56 +41,81 @@ public class ControlledTableOrderManager extends TableOrdersManager {
         try {
             source.delete(order);
         } catch (IOException e) {
-            e.printStackTrace();
+            add(order);
         }
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Order> c) {
-        c.forEach(this::createControlledOrder);
-        return super.addAll(index, c);
+    public void addItem(MenuItem item, int tableNumber) {
+        super.addItem(item, tableNumber);
+        store();
     }
 
     @Override
-    public void add(int index, Order element) {
-        createControlledOrder(element);
+    public boolean addAll(int index, Collection<? extends Order> c) throws NoFreeTableException {
+        boolean areAdded = false;
+        try {
+            areAdded = super.addAll(index, c);
+            c.forEach(this::createControlledOrder);
+        } catch (NoFreeTableException e) {
+            super.removeAll(c);
+        }
+        return areAdded;
+    }
+
+    @Override
+    public void add(int index, Order element) throws AlreadyAddedException {
         super.add(index, element);
+        createControlledOrder(element);
     }
 
     @Override
     public Order remove(int index) {
-        delete(super.get(index));
-        return super.remove(index);
+        Order removedOrder = super.remove(index);
+        if (Objects.nonNull(removedOrder))
+            delete(super.get(index));
+        return removedOrder;
     }
 
     @Override
-    public boolean add(Order order) {
+    public boolean add(Order order) throws NoFreeTableException {
+        boolean isAdded = super.add(order);
         createControlledOrder(order);
-        return super.add(order);
+        return isAdded;
     }
 
     @Override
     public boolean remove(Object o) {
-        delete((Order) o);
-        return super.remove(o);
+        boolean isRemoved = super.remove(o);
+        if (isRemoved)
+            delete((Order) o);
+        return isRemoved;
     }
 
     @Override
-    public boolean addAll(Collection<? extends Order> c) {
-        c.forEach(this::createControlledOrder);
-        return super.addAll(c);
+    public boolean addAll(Collection<? extends Order> c) throws NoFreeTableException {
+        try {
+            boolean areAdded = super.addAll(c);
+            c.forEach(this::createControlledOrder);
+            return areAdded;
+        } catch (NoFreeTableException e) {
+            super.removeAll(c);
+        }
+        return false;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        boolean areRemoved = super.removeAll(c);
         c.forEach(object -> delete((Order) object));
-        return super.removeAll(c);
+        return areRemoved;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        boolean areRetained = super.retainAll(c);
         this.stream().filter(order -> !c.contains(order)).forEach(this::delete);
-        return super.retainAll(c);
+        return areRetained;
     }
 
     public void store() {
@@ -114,20 +139,28 @@ public class ControlledTableOrderManager extends TableOrdersManager {
     }
 
     @Override
-    public int remove(Order order) throws IOException {
-        source.delete(order);
-        return super.remove(order);
+    public int remove(Order order) {
+        int removedOrders = super.remove(order);
+        try {
+            if (removedOrders > 0)
+                source.delete(order);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return removedOrders;
     }
 
     @Override
     public int removeAll(Order order) throws IOException {
-        source.delete(order);
-        return super.removeAll(order);
+        int removedOrders = super.removeAll(order);
+        if (removedOrders > 0)
+            source.delete(order);
+        return removedOrders;
     }
 
     @Override
     public void clear() {
-        this.forEach(this::delete);
         super.clear();
+        this.forEach(this::delete);
     }
 }

@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,23 +33,24 @@ public class OrdersManagerBinaryFileSource extends OrderManagerFileSource {
         order.setDateTime(orderTime);
         order.addAll(items);
     }
-    //todo возвращй ArrayList по ссылке List
-    private MenuItem[] loadMenuItems(DataInputStream inputStream) throws IOException {
+
+    //todo возвращй ArrayList по ссылке List+
+    private List<MenuItem> loadMenuItems(DataInputStream inputStream) throws IOException {
         int size = inputStream.readInt();
-        MenuItem[] items = new MenuItem[size];
+        List<MenuItem> items = new ArrayList<>(size);
         String name, description, drinkType;
         int cost;
         double alcoholVol;
-        for (int i = 0; i < items.length; i++) {
+        for (int i = 0; i < size; i++) {
             name = inputStream.readUTF();
             description = inputStream.readUTF();
             cost = inputStream.readInt();
             if (inputStream.readUTF().equals("Drink")) {
                 alcoholVol = inputStream.readDouble();
                 drinkType = inputStream.readUTF();
-                items[i] = new Drink(cost, name, description, alcoholVol, DrinkTypeEnum.valueOf(drinkType));
+                items.add(new Drink(cost, name, description, alcoholVol, DrinkTypeEnum.valueOf(drinkType)));
             } else
-                items[i] = new Dish(cost, description, name);
+                items.add(new Dish(cost, description, name));
         }
         return items;
     }
