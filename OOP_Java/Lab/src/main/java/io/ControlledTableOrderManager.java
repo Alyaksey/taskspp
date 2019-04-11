@@ -3,6 +3,7 @@ package io;
 import barBossHouse.*;
 import factory.OrdersFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
@@ -40,7 +41,10 @@ public class ControlledTableOrderManager extends TableOrdersManager {
     private void delete(Order order) {
         try {
             source.delete(order);
-        } catch (IOException e) {
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        catch (IOException e) {
             add(order);
         }
     }
