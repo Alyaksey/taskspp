@@ -31,8 +31,6 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
         ControlledInternetOrder internetOrder = (ControlledInternetOrder) factory.createInternetOrder(order);
         try {
             source.create(internetOrder);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
             remove(order);
         }
@@ -41,6 +39,8 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
     private void delete(Order order) {
         try {
             source.delete(order);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         } catch (IOException e) {
             add(order);
         }
