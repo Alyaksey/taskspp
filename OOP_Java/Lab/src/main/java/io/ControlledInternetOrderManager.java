@@ -5,6 +5,7 @@ import barBossHouse.InternetOrdersManager;
 import barBossHouse.Order;
 import factory.OrdersFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
@@ -30,6 +31,8 @@ public class ControlledInternetOrderManager extends InternetOrdersManager {
         ControlledInternetOrder internetOrder = (ControlledInternetOrder) factory.createInternetOrder(order);
         try {
             source.create(internetOrder);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         } catch (IOException ex) {
             remove(order);
         }
